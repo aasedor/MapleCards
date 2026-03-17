@@ -1,0 +1,308 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <style>
+    @keyframes breathe {
+      0%, 100% { transform: translateY(0) scaleY(1); }
+      50% { transform: translateY(-1.5px) scaleY(1.008); }
+    }
+    @keyframes hatSway {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(0.4deg); }
+      75% { transform: rotate(-0.4deg); }
+    }
+    .body { animation: breathe 4s ease-in-out infinite; transform-origin: 200px 300px; }
+    .hat-group { animation: hatSway 5s ease-in-out infinite; transform-origin: 200px 78px; }
+    .caption {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      fill: #e63946;
+      text-anchor: middle;
+      letter-spacing: 2px;
+    }
+  </style>
+
+  <defs>
+    <!-- Face cutout mask -->
+    <mask id="face-mask">
+      <rect width="400" height="500" fill="white"/>
+      <circle cx="200" cy="108" r="42" fill="black"/>
+    </mask>
+
+    <!-- Gradients -->
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b8d4e3"/>
+      <stop offset="60%" stop-color="#d4e6ef"/>
+      <stop offset="100%" stop-color="#e8f0e4"/>
+    </linearGradient>
+
+    <linearGradient id="tunicGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4232a"/>
+      <stop offset="40%" stop-color="#c1121f"/>
+      <stop offset="100%" stop-color="#a00d1a"/>
+    </linearGradient>
+
+    <linearGradient id="tunicShadow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8a0c15"/>
+      <stop offset="20%" stop-color="#c1121f" stop-opacity="0"/>
+      <stop offset="80%" stop-color="#c1121f" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#8a0c15"/>
+    </linearGradient>
+
+    <linearGradient id="bootGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6B4F33"/>
+      <stop offset="50%" stop-color="#5C4033"/>
+      <stop offset="100%" stop-color="#3E2A1E"/>
+    </linearGradient>
+
+    <linearGradient id="hatGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#B8903C"/>
+      <stop offset="40%" stop-color="#A0782C"/>
+      <stop offset="100%" stop-color="#8B6914"/>
+    </linearGradient>
+
+    <linearGradient id="beltGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6B4F33"/>
+      <stop offset="100%" stop-color="#4A3525"/>
+    </linearGradient>
+
+    <linearGradient id="pantsGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e2040"/>
+      <stop offset="100%" stop-color="#12132a"/>
+    </linearGradient>
+
+    <linearGradient id="buttonGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFE44D"/>
+      <stop offset="50%" stop-color="#FFD700"/>
+      <stop offset="100%" stop-color="#C9A800"/>
+    </linearGradient>
+
+    <linearGradient id="mountainGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a9bb0"/>
+      <stop offset="100%" stop-color="#96b3c4"/>
+    </linearGradient>
+
+    <linearGradient id="mountainGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8fb0c3"/>
+      <stop offset="100%" stop-color="#a8c5d4"/>
+    </linearGradient>
+
+    <linearGradient id="treeGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a7c5c"/>
+      <stop offset="100%" stop-color="#3a6349"/>
+    </linearGradient>
+
+    <!-- Button shine filter -->
+    <filter id="buttonShine">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="shadow"/>
+      <feOffset dx="0" dy="1" result="offsetShadow"/>
+      <feMerge>
+        <feMergeNode in="offsetShadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- ========== BACKGROUND ========== -->
+  <rect width="400" height="500" fill="url(#skyGrad)"/>
+
+  <!-- Distant mountains -->
+  <path d="M0 420 L30 350 L70 380 L110 320 L150 360 L190 290 L220 340 L260 300 L300 350 L340 310 L370 360 L400 330 L400 420 Z" fill="url(#mountainGrad1)" opacity="0.5"/>
+  <path d="M0 420 L40 370 L80 390 L120 350 L160 380 L200 340 L240 370 L280 345 L320 380 L360 355 L400 375 L400 420 Z" fill="url(#mountainGrad2)" opacity="0.45"/>
+
+  <!-- Snow caps on main peaks -->
+  <path d="M185 290 L190 295 L195 290 L200 293 L205 288 L210 293 L215 290 L220 296 L225 292" fill="none" stroke="white" stroke-width="2" opacity="0.6"/>
+  <path d="M255 300 L260 304 L265 299 L270 303 L275 298" fill="none" stroke="white" stroke-width="2" opacity="0.5"/>
+
+  <!-- Tree line silhouettes -->
+  <g opacity="0.35">
+    <!-- Left trees -->
+    <path d="M10 420 L18 385 L26 420 Z" fill="url(#treeGrad)"/>
+    <path d="M22 420 L32 378 L42 420 Z" fill="url(#treeGrad)"/>
+    <path d="M38 420 L46 390 L54 420 Z" fill="url(#treeGrad)"/>
+    <path d="M50 420 L60 375 L70 420 Z" fill="url(#treeGrad)"/>
+    <path d="M62 420 L70 392 L78 420 Z" fill="url(#treeGrad)"/>
+    <!-- Right trees -->
+    <path d="M320 420 L330 380 L340 420 Z" fill="url(#treeGrad)"/>
+    <path d="M335 420 L343 388 L351 420 Z" fill="url(#treeGrad)"/>
+    <path d="M348 420 L358 372 L368 420 Z" fill="url(#treeGrad)"/>
+    <path d="M362 420 L370 390 L378 420 Z" fill="url(#treeGrad)"/>
+    <path d="M375 420 L385 382 L395 420 Z" fill="url(#treeGrad)"/>
+  </g>
+
+  <!-- Ground plane -->
+  <rect x="0" y="418" width="400" height="82" fill="#6b8f71" opacity="0.25"/>
+  <ellipse cx="200" cy="435" rx="160" ry="12" fill="#5a7d5e" opacity="0.2"/>
+
+  <!-- ========== CHARACTER ========== -->
+  <g class="body" mask="url(#face-mask)">
+
+    <!-- Ears -->
+    <ellipse cx="156" cy="110" rx="9" ry="12" fill="#d4956b"/>
+    <ellipse cx="156" cy="110" rx="5" ry="7" fill="#c4845a"/>
+    <ellipse cx="244" cy="110" rx="9" ry="12" fill="#d4956b"/>
+    <ellipse cx="244" cy="110" rx="5" ry="7" fill="#c4845a"/>
+
+    <!-- Neck -->
+    <rect x="185" y="145" width="30" height="22" fill="#d4956b" rx="5"/>
+    <rect x="185" y="145" width="30" height="22" fill="rgba(0,0,0,0.06)" rx="5"/>
+
+    <!-- Chin/jaw below face hole -->
+    <path d="M165 138 Q180 160 200 165 Q220 160 235 138" fill="#d4956b"/>
+
+    <!-- ======= RED SERGE TUNIC ======= -->
+    <!-- Main tunic body -->
+    <path d="M148 168 L138 174 L118 190 L112 300 L288 300 L282 190 L262 174 L252 168 Q248 162 200 162 Q152 162 148 168 Z" fill="url(#tunicGrad)"/>
+    <!-- Side shadows on tunic -->
+    <path d="M148 168 L138 174 L118 190 L112 300 L288 300 L282 190 L262 174 L252 168 Q248 162 200 162 Q152 162 148 168 Z" fill="url(#tunicShadow)" opacity="0.5"/>
+
+    <!-- Collar (dark navy stand collar) -->
+    <path d="M170 164 L180 178 L195 172 L200 174 L205 172 L220 178 L230 164 Q215 158 200 158 Q185 158 170 164 Z" fill="#1a1a2e"/>
+    <path d="M170 164 L180 178 L195 172 L200 174 L205 172 L220 178 L230 164" fill="none" stroke="#0d0d1a" stroke-width="1.2"/>
+
+    <!-- Shoulder epaulettes -->
+    <path d="M130 175 L152 166 L157 172 L135 183 Z" fill="#c1121f" stroke="#8a0c15" stroke-width="1"/>
+    <path d="M270 175 L248 166 L243 172 L265 183 Z" fill="#c1121f" stroke="#8a0c15" stroke-width="1"/>
+    <!-- Epaulette buttons -->
+    <circle cx="142" cy="172" r="3" fill="url(#buttonGrad)" stroke="#B8960C" stroke-width="0.5"/>
+    <circle cx="258" cy="172" r="3" fill="url(#buttonGrad)" stroke="#B8960C" stroke-width="0.5"/>
+
+    <!-- Sam Browne belt - cross-chest strap (right shoulder to left hip) -->
+    <path d="M256 174 L138 292" stroke="url(#beltGrad)" stroke-width="9" stroke-linecap="round"/>
+    <path d="M256 174 L138 292" stroke="#3E2A1E" stroke-width="9" stroke-linecap="round" opacity="0.12"/>
+    <!-- Strap edge highlights -->
+    <path d="M256 174 L138 292" stroke="#7a6040" stroke-width="1" stroke-linecap="round" opacity="0.3" transform="translate(-3,-1)"/>
+
+    <!-- Tunic center front panel (placket) -->
+    <rect x="192" y="178" width="16" height="115" fill="#a00d1a" rx="1" opacity="0.3"/>
+
+    <!-- Brass buttons (two rows) -->
+    <g filter="url(#buttonShine)">
+      <circle cx="195" cy="192" r="4.5" fill="url(#buttonGrad)" stroke="#B8960C" stroke-width="0.8"/>
+      <circle cx="205" cy="192" r="4.5" fill="url(#buttonGrad)" stroke="#B8960C" stroke-width="0.8"/>
+      <circle cx="195" cy="214" r="4.5" fill="url(#buttonGrad)" stroke="#B8960C" stroke-width="0.8"/>
+      <circle cx="205" cy="214" r="4.5" fill="url(#buttonGrad)" stroke="#B8960C" stroke-width="0.8"/>
+      <circle cx="195" cy="236" r="4.5" fill="url(#buttonGrad)" stroke="#B8960C" stroke-width="0.8"/>
+      <circle cx="205" cy="236" r="4.5" fill="url(#buttonGrad)" stroke="#B8960C" stroke-width="0.8"/>
+      <circle cx="195" cy="258" r="4.5" fill="url(#buttonGrad)" stroke="#B8960C" stroke-width="0.8"/>
+      <circle cx="205" cy="258" r="4.5" fill="url(#buttonGrad)" stroke="#B8960C" stroke-width="0.8"/>
+    </g>
+    <!-- Button shine dots -->
+    <circle cx="194" cy="191" r="1.2" fill="white" opacity="0.5"/>
+    <circle cx="204" cy="191" r="1.2" fill="white" opacity="0.5"/>
+    <circle cx="194" cy="213" r="1.2" fill="white" opacity="0.5"/>
+    <circle cx="204" cy="213" r="1.2" fill="white" opacity="0.5"/>
+    <circle cx="194" cy="235" r="1.2" fill="white" opacity="0.5"/>
+    <circle cx="204" cy="235" r="1.2" fill="white" opacity="0.5"/>
+
+    <!-- Waist belt -->
+    <rect x="112" y="285" width="176" height="15" fill="url(#beltGrad)" rx="2"/>
+    <rect x="112" y="285" width="176" height="15" fill="rgba(0,0,0,0.08)" rx="2"/>
+    <!-- Belt buckle -->
+    <rect x="189" y="283" width="22" height="19" fill="url(#buttonGrad)" stroke="#B8960C" stroke-width="1" rx="3"/>
+    <rect x="194" y="287" width="12" height="11" fill="none" stroke="#B8960C" stroke-width="1.2" rx="1.5"/>
+    <!-- Belt keeper -->
+    <rect x="160" y="285" width="8" height="15" fill="#4A3525" rx="1"/>
+    <rect x="232" y="285" width="8" height="15" fill="#4A3525" rx="1"/>
+
+    <!-- ======= ARMS ======= -->
+    <!-- Left arm (hand on hip) -->
+    <path d="M118 190 L102 225 L96 250 Q90 270 105 280 L130 290 L135 275 L118 268 L122 245 L130 215" fill="url(#tunicGrad)" stroke="#8a0c15" stroke-width="1.5"/>
+    <!-- Left hand on hip -->
+    <path d="M105 278 Q98 285 102 292 Q108 300 118 296 L132 288 L128 278 Z" fill="#d4956b"/>
+    <path d="M110 284 L115 282" stroke="#c4845a" stroke-width="1" opacity="0.5"/>
+    <path d="M108 288 L114 286" stroke="#c4845a" stroke-width="1" opacity="0.5"/>
+
+    <!-- Right arm (resting at side, slightly forward) -->
+    <path d="M282 190 L296 225 L300 260 L298 300 L296 320 L275 320 L278 300 L280 260 L278 230 L270 205" fill="url(#tunicGrad)" stroke="#8a0c15" stroke-width="1.5"/>
+    <!-- Right cuff -->
+    <rect x="275" y="310" width="24" height="10" fill="#1a1a2e" rx="2"/>
+    <!-- Right hand -->
+    <path d="M276 320 Q272 328 276 336 Q282 342 292 338 Q298 332 296 324 L296 320 Z" fill="#d4956b"/>
+    <path d="M280 326 L288 324" stroke="#c4845a" stroke-width="1" opacity="0.5"/>
+    <path d="M279 330 L287 328" stroke="#c4845a" stroke-width="1" opacity="0.5"/>
+
+    <!-- Left cuff -->
+    <path d="M98 270 Q93 272 93 278 L95 282 L120 290 L124 282 L112 275" fill="#1a1a2e"/>
+
+    <!-- ======= BREECHES (Blue with yellow stripe) ======= -->
+    <path d="M140 300 L128 400 L162 400 L178 330 L222 330 L238 400 L272 400 L260 300 Z" fill="url(#pantsGrad)"/>
+    <!-- Yellow cavalry stripes -->
+    <line x1="131" y1="310" x2="131" y2="400" stroke="#FFD700" stroke-width="3.5"/>
+    <line x1="269" y1="310" x2="269" y2="400" stroke="#FFD700" stroke-width="3.5"/>
+    <!-- Subtle inner stripe highlight -->
+    <line x1="130" y1="310" x2="130" y2="400" stroke="#FFE44D" stroke-width="1" opacity="0.4"/>
+    <line x1="268" y1="310" x2="268" y2="400" stroke="#FFE44D" stroke-width="1" opacity="0.4"/>
+
+    <!-- ======= RIDING BOOTS ======= -->
+    <!-- Left boot -->
+    <path d="M122 385 L120 430 L122 435 L165 435 L167 430 L165 385 Z" fill="url(#bootGrad)" stroke="#2E1A0E" stroke-width="1.5"/>
+    <!-- Boot top band -->
+    <rect x="122" y="385" width="43" height="6" fill="#6B4F33" rx="1"/>
+    <line x1="122" y1="391" x2="165" y2="391" stroke="#2E1A0E" stroke-width="1"/>
+    <!-- Boot heel -->
+    <rect x="124" y="430" width="14" height="8" fill="#3E2A1E" rx="1"/>
+    <!-- Boot sole -->
+    <rect x="120" y="433" width="47" height="4" fill="#2E1A0E" rx="1.5"/>
+    <!-- Boot stitching -->
+    <line x1="143" y1="392" x2="143" y2="430" stroke="#4A3525" stroke-width="0.8" stroke-dasharray="3 3"/>
+    <!-- Left spur -->
+    <circle cx="128" cy="428" r="3" fill="none" stroke="#C0C0C0" stroke-width="1.5"/>
+    <line x1="125" y1="428" x2="118" y2="428" stroke="#C0C0C0" stroke-width="1.5"/>
+    <polygon points="115,425 112,428 115,431" fill="#C0C0C0"/>
+
+    <!-- Right boot -->
+    <path d="M235 385 L233 430 L235 435 L278 435 L280 430 L278 385 Z" fill="url(#bootGrad)" stroke="#2E1A0E" stroke-width="1.5"/>
+    <!-- Boot top band -->
+    <rect x="235" y="385" width="43" height="6" fill="#6B4F33" rx="1"/>
+    <line x1="235" y1="391" x2="278" y2="391" stroke="#2E1A0E" stroke-width="1"/>
+    <!-- Boot heel -->
+    <rect x="262" y="430" width="14" height="8" fill="#3E2A1E" rx="1"/>
+    <!-- Boot sole -->
+    <rect x="233" y="433" width="47" height="4" fill="#2E1A0E" rx="1.5"/>
+    <!-- Boot stitching -->
+    <line x1="256" y1="392" x2="256" y2="430" stroke="#4A3525" stroke-width="0.8" stroke-dasharray="3 3"/>
+    <!-- Right spur -->
+    <circle cx="272" cy="428" r="3" fill="none" stroke="#C0C0C0" stroke-width="1.5"/>
+    <line x1="275" y1="428" x2="282" y2="428" stroke="#C0C0C0" stroke-width="1.5"/>
+    <polygon points="285,425 288,428 285,431" fill="#C0C0C0"/>
+  </g>
+
+  <!-- ======= STETSON HAT (above mask so it overlaps face edge) ======= -->
+  <g class="hat-group">
+    <!-- Hat brim - bottom shadow -->
+    <ellipse cx="200" cy="80" rx="66" ry="14" fill="#6B4F12" opacity="0.4"/>
+    <!-- Hat brim main -->
+    <ellipse cx="200" cy="78" rx="64" ry="13" fill="#8B6914" stroke="#5A4210" stroke-width="1.5"/>
+    <!-- Brim highlight -->
+    <ellipse cx="200" cy="76" rx="58" ry="9" fill="#9C7A1E" opacity="0.3"/>
+    <!-- Brim curl left -->
+    <path d="M136 78 Q140 72 148 75" fill="none" stroke="#5A4210" stroke-width="1.2"/>
+    <!-- Brim curl right -->
+    <path d="M264 78 Q260 72 252 75" fill="none" stroke="#5A4210" stroke-width="1.2"/>
+
+    <!-- Hat crown -->
+    <path d="M164 78 L168 32 Q184 18 200 16 Q216 18 232 32 L236 78 Z" fill="url(#hatGrad)" stroke="#5A4210" stroke-width="1.5"/>
+
+    <!-- Crown dent/pinch (the Montana crease) -->
+    <path d="M175 32 Q187 44 200 40 Q213 44 225 32" fill="#8B6914" stroke="#7A5E12" stroke-width="1"/>
+    <!-- Crown top highlight -->
+    <path d="M180 24 Q190 20 200 19 Q210 20 220 24" fill="none" stroke="#C4A24E" stroke-width="1" opacity="0.4"/>
+
+    <!-- Hat band -->
+    <rect x="166" y="66" width="68" height="10" fill="#5A4210" rx="2"/>
+    <rect x="166" y="66" width="68" height="10" fill="rgba(0,0,0,0.15)" rx="2"/>
+    <!-- Band detail stitching -->
+    <line x1="170" y1="71" x2="230" y2="71" stroke="#7A5E12" stroke-width="0.6" stroke-dasharray="2 2"/>
+
+    <!-- Crown side shadows -->
+    <path d="M164 78 L168 32 Q175 24 180 28 L172 78 Z" fill="rgba(0,0,0,0.1)"/>
+    <path d="M236 78 L232 32 Q225 24 220 28 L228 78 Z" fill="rgba(0,0,0,0.1)"/>
+  </g>
+
+  <!-- Face hole transparent circle (the actual cutout is via the mask) -->
+  <!-- Subtle ring to frame where the photo goes -->
+  <circle cx="200" cy="108" r="42" fill="none" stroke="#d4956b" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- ========== CAPTION ========== -->
+  <text class="caption" x="200" y="472" text-anchor="middle">THE MOUNTIES ALWAYS GET THEIR MAN</text>
+</svg>

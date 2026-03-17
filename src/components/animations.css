@@ -1,0 +1,313 @@
+/* ─── MapleCard Animation Overlays ─────────────────────────────────
+   8 pure CSS @keyframes animations for card preview.
+   Each renders as a transparent layer over the card image.
+   Respects prefers-reduced-motion.
+──────────────────────────────────────────────────────────────────── */
+
+/* ── Disable all animations for reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .mc-anim-layer,
+  .mc-anim-layer * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── Shared overlay container ── */
+.mc-anim-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   1. FALLING MAPLE LEAVES 🍁
+   ════════════════════════════════════════════════════════════════════ */
+@keyframes mc-leaf-fall {
+  0% { transform: translateY(-40px) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(520px) rotate(360deg); opacity: 0.3; }
+}
+@keyframes mc-leaf-sway {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(20px); }
+}
+
+.mc-leaf {
+  position: absolute;
+  top: -40px;
+  font-size: 18px;
+  animation: mc-leaf-fall linear infinite;
+}
+.mc-leaf::after { content: '🍁'; }
+.mc-leaf:nth-child(1)  { left: 5%;  font-size: 14px; animation-duration: 6s; animation-delay: 0s; }
+.mc-leaf:nth-child(2)  { left: 15%; font-size: 20px; animation-duration: 7s; animation-delay: 0.5s; }
+.mc-leaf:nth-child(3)  { left: 25%; font-size: 12px; animation-duration: 5.5s; animation-delay: 1s; }
+.mc-leaf:nth-child(4)  { left: 35%; font-size: 18px; animation-duration: 8s; animation-delay: 0.3s; }
+.mc-leaf:nth-child(5)  { left: 45%; font-size: 15px; animation-duration: 6.5s; animation-delay: 1.5s; }
+.mc-leaf:nth-child(6)  { left: 55%; font-size: 22px; animation-duration: 7.5s; animation-delay: 0.8s; }
+.mc-leaf:nth-child(7)  { left: 65%; font-size: 13px; animation-duration: 5s; animation-delay: 2s; }
+.mc-leaf:nth-child(8)  { left: 75%; font-size: 19px; animation-duration: 6.8s; animation-delay: 0.2s; }
+.mc-leaf:nth-child(9)  { left: 85%; font-size: 16px; animation-duration: 7.2s; animation-delay: 1.2s; }
+.mc-leaf:nth-child(10) { left: 10%; font-size: 11px; animation-duration: 8.5s; animation-delay: 2.5s; }
+.mc-leaf:nth-child(11) { left: 50%; font-size: 17px; animation-duration: 6.2s; animation-delay: 3s; }
+.mc-leaf:nth-child(12) { left: 90%; font-size: 14px; animation-duration: 7.8s; animation-delay: 1.8s; }
+
+/* ════════════════════════════════════════════════════════════════════
+   2. FALLING SNOWFLAKES ❄️
+   ════════════════════════════════════════════════════════════════════ */
+@keyframes mc-snow-fall {
+  0% { transform: translateY(-20px) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  50% { transform: translateY(250px) translateX(15px); }
+  100% { transform: translateY(520px) translateX(-10px); opacity: 0.2; }
+}
+
+.mc-snowflake {
+  position: absolute;
+  top: -20px;
+  color: #fff;
+  text-shadow: 0 0 3px rgba(255,255,255,0.8);
+  animation: mc-snow-fall linear infinite;
+}
+.mc-snowflake::after { content: '❄'; }
+.mc-snowflake:nth-child(1)  { left: 3%;  font-size: 10px; animation-duration: 8s; animation-delay: 0s; opacity: 0.7; }
+.mc-snowflake:nth-child(2)  { left: 10%; font-size: 14px; animation-duration: 6s; animation-delay: 0.5s; opacity: 0.9; }
+.mc-snowflake:nth-child(3)  { left: 18%; font-size: 8px;  animation-duration: 9s; animation-delay: 1s; opacity: 0.5; }
+.mc-snowflake:nth-child(4)  { left: 27%; font-size: 12px; animation-duration: 7s; animation-delay: 0.3s; opacity: 0.8; }
+.mc-snowflake:nth-child(5)  { left: 35%; font-size: 16px; animation-duration: 6.5s; animation-delay: 1.5s; opacity: 0.6; }
+.mc-snowflake:nth-child(6)  { left: 43%; font-size: 9px;  animation-duration: 8.5s; animation-delay: 0.8s; opacity: 0.7; }
+.mc-snowflake:nth-child(7)  { left: 52%; font-size: 13px; animation-duration: 7.5s; animation-delay: 2s; opacity: 0.9; }
+.mc-snowflake:nth-child(8)  { left: 60%; font-size: 11px; animation-duration: 6.8s; animation-delay: 0.2s; opacity: 0.5; }
+.mc-snowflake:nth-child(9)  { left: 68%; font-size: 15px; animation-duration: 7.2s; animation-delay: 1.2s; opacity: 0.8; }
+.mc-snowflake:nth-child(10) { left: 76%; font-size: 10px; animation-duration: 9.5s; animation-delay: 2.5s; opacity: 0.6; }
+.mc-snowflake:nth-child(11) { left: 84%; font-size: 12px; animation-duration: 6.2s; animation-delay: 3s; opacity: 0.7; }
+.mc-snowflake:nth-child(12) { left: 92%; font-size: 8px;  animation-duration: 8.2s; animation-delay: 1.8s; opacity: 0.9; }
+.mc-snowflake:nth-child(13) { left: 22%; font-size: 14px; animation-duration: 7.8s; animation-delay: 3.5s; opacity: 0.5; }
+.mc-snowflake:nth-child(14) { left: 48%; font-size: 11px; animation-duration: 6.3s; animation-delay: 4s; opacity: 0.8; }
+.mc-snowflake:nth-child(15) { left: 72%; font-size: 13px; animation-duration: 8.8s; animation-delay: 0.6s; opacity: 0.6; }
+
+/* ════════════════════════════════════════════════════════════════════
+   3. CONFETTI BURST 🎉
+   ════════════════════════════════════════════════════════════════════ */
+@keyframes mc-confetti-burst {
+  0% { transform: translate(0, 0) rotate(0deg) scale(0); opacity: 1; }
+  20% { transform: translate(var(--cx), var(--cy)) rotate(180deg) scale(1); opacity: 1; }
+  100% { transform: translate(var(--cx), calc(var(--cy) + 300px)) rotate(720deg) scale(0.6); opacity: 0; }
+}
+
+.mc-confetti-piece {
+  position: absolute;
+  bottom: 20%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  animation: mc-confetti-burst 3s ease-out infinite;
+}
+.mc-confetti-piece:nth-child(1)  { --cx: -120px; --cy: -200px; background: #c0392b; border-radius: 50%; animation-delay: 0s; }
+.mc-confetti-piece:nth-child(2)  { --cx: 80px;   --cy: -180px; background: #f39c12; border-radius: 0; animation-delay: 0.1s; }
+.mc-confetti-piece:nth-child(3)  { --cx: -60px;  --cy: -220px; background: #2ecc71; border-radius: 50%; animation-delay: 0.2s; }
+.mc-confetti-piece:nth-child(4)  { --cx: 140px;  --cy: -160px; background: #3498db; border-radius: 0; animation-delay: 0.15s; }
+.mc-confetti-piece:nth-child(5)  { --cx: -100px; --cy: -190px; background: #e74c3c; border-radius: 50%; animation-delay: 0.3s; }
+.mc-confetti-piece:nth-child(6)  { --cx: 40px;   --cy: -240px; background: #9b59b6; border-radius: 0; animation-delay: 0.05s; }
+.mc-confetti-piece:nth-child(7)  { --cx: -150px; --cy: -150px; background: #1abc9c; border-radius: 50%; animation-delay: 0.25s; }
+.mc-confetti-piece:nth-child(8)  { --cx: 110px;  --cy: -210px; background: #f1c40f; border-radius: 0; animation-delay: 0.35s; }
+.mc-confetti-piece:nth-child(9)  { --cx: -30px;  --cy: -250px; background: #e67e22; border-radius: 50%; animation-delay: 0.12s; }
+.mc-confetti-piece:nth-child(10) { --cx: 160px;  --cy: -170px; background: #c0392b; border-radius: 0; animation-delay: 0.28s; }
+.mc-confetti-piece:nth-child(11) { --cx: -80px;  --cy: -230px; background: #2ecc71; border-radius: 50%; animation-delay: 0.4s; }
+.mc-confetti-piece:nth-child(12) { --cx: 50px;   --cy: -200px; background: #3498db; border-radius: 0; animation-delay: 0.18s; }
+.mc-confetti-piece:nth-child(13) { --cx: -140px; --cy: -180px; background: #9b59b6; border-radius: 50%; animation-delay: 0.08s; }
+.mc-confetti-piece:nth-child(14) { --cx: 100px;  --cy: -240px; background: #e74c3c; border-radius: 0; animation-delay: 0.32s; }
+.mc-confetti-piece:nth-child(15) { --cx: -20px;  --cy: -210px; background: #f1c40f; border-radius: 50%; animation-delay: 0.22s; }
+.mc-confetti-piece:nth-child(16) { --cx: 130px;  --cy: -190px; background: #1abc9c; border-radius: 0; animation-delay: 0.38s; }
+.mc-confetti-piece:nth-child(17) { --cx: -110px; --cy: -260px; background: #e67e22; border-radius: 50%; animation-delay: 0.15s; }
+.mc-confetti-piece:nth-child(18) { --cx: 70px;   --cy: -230px; background: #c0392b; border-radius: 0; animation-delay: 0.42s; }
+.mc-confetti-piece:nth-child(19) { --cx: -50px;  --cy: -200px; background: #f39c12; border-radius: 50%; animation-delay: 0.2s; }
+.mc-confetti-piece:nth-child(20) { --cx: 90px;   --cy: -220px; background: #2ecc71; border-radius: 0; animation-delay: 0.36s; }
+
+/* ════════════════════════════════════════════════════════════════════
+   4. AURORA SHIMMER 🌌
+   ════════════════════════════════════════════════════════════════════ */
+@keyframes mc-aurora-1 {
+  0%, 100% { opacity: 0.1; transform: translateX(-10%); }
+  50% { opacity: 0.35; transform: translateX(10%); }
+}
+@keyframes mc-aurora-2 {
+  0%, 100% { opacity: 0.15; transform: translateX(5%); }
+  50% { opacity: 0.3; transform: translateX(-8%); }
+}
+@keyframes mc-aurora-3 {
+  0%, 100% { opacity: 0.08; transform: translateX(-5%); }
+  50% { opacity: 0.25; transform: translateX(12%); }
+}
+
+.mc-aurora-band {
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  height: 60px;
+  filter: blur(20px);
+}
+.mc-aurora-band:nth-child(1) {
+  top: 5%;
+  background: linear-gradient(90deg, transparent, rgba(26,188,156,0.4), rgba(52,152,219,0.3), transparent);
+  animation: mc-aurora-1 8s ease-in-out infinite;
+}
+.mc-aurora-band:nth-child(2) {
+  top: 15%;
+  background: linear-gradient(90deg, transparent, rgba(155,89,182,0.35), rgba(26,188,156,0.25), transparent);
+  animation: mc-aurora-2 10s ease-in-out infinite;
+}
+.mc-aurora-band:nth-child(3) {
+  top: 25%;
+  background: linear-gradient(90deg, transparent, rgba(46,204,113,0.3), rgba(155,89,182,0.2), transparent);
+  animation: mc-aurora-3 12s ease-in-out infinite;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   5. FIREWORKS 🎆
+   ════════════════════════════════════════════════════════════════════ */
+@keyframes mc-firework-explode {
+  0% { transform: scale(0); opacity: 1; }
+  50% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes mc-firework-spark {
+  0% { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
+}
+
+.mc-firework {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+}
+.mc-firework-group {
+  position: absolute;
+}
+.mc-firework-group:nth-child(1) { top: 15%; left: 20%; }
+.mc-firework-group:nth-child(2) { top: 25%; left: 65%; }
+.mc-firework-group:nth-child(3) { top: 10%; left: 45%; }
+
+.mc-firework-group:nth-child(1) .mc-firework { background: #f1c40f; animation: mc-firework-spark 2s ease-out infinite; animation-delay: 0s; }
+.mc-firework-group:nth-child(2) .mc-firework { background: #e74c3c; animation: mc-firework-spark 2s ease-out infinite; animation-delay: 0.7s; }
+.mc-firework-group:nth-child(3) .mc-firework { background: #3498db; animation: mc-firework-spark 2s ease-out infinite; animation-delay: 1.4s; }
+
+.mc-firework:nth-child(1)  { --sx: 0px;   --sy: -30px; border-radius: 50%; }
+.mc-firework:nth-child(2)  { --sx: 21px;  --sy: -21px; border-radius: 50%; }
+.mc-firework:nth-child(3)  { --sx: 30px;  --sy: 0px;   border-radius: 50%; }
+.mc-firework:nth-child(4)  { --sx: 21px;  --sy: 21px;  border-radius: 50%; }
+.mc-firework:nth-child(5)  { --sx: 0px;   --sy: 30px;  border-radius: 50%; }
+.mc-firework:nth-child(6)  { --sx: -21px; --sy: 21px;  border-radius: 50%; }
+.mc-firework:nth-child(7)  { --sx: -30px; --sy: 0px;   border-radius: 50%; }
+.mc-firework:nth-child(8)  { --sx: -21px; --sy: -21px; border-radius: 50%; }
+
+/* ════════════════════════════════════════════════════════════════════
+   6. FALLING PETALS 🌸
+   ════════════════════════════════════════════════════════════════════ */
+@keyframes mc-petal-fall {
+  0% { transform: translateY(-30px) rotate(0deg) scale(1); opacity: 0; }
+  10% { opacity: 0.8; }
+  100% { transform: translateY(520px) rotate(200deg) scale(0.6); opacity: 0.1; }
+}
+
+.mc-petal {
+  position: absolute;
+  top: -30px;
+  width: 10px;
+  height: 14px;
+  background: rgba(255,182,193,0.7);
+  border-radius: 50% 0 50% 0;
+  animation: mc-petal-fall linear infinite;
+}
+.mc-petal:nth-child(1)  { left: 8%;  animation-duration: 7s;   animation-delay: 0s;   background: rgba(255,182,193,0.8); }
+.mc-petal:nth-child(2)  { left: 18%; animation-duration: 8s;   animation-delay: 0.5s; background: rgba(255,192,203,0.7); width: 8px; height: 11px; }
+.mc-petal:nth-child(3)  { left: 28%; animation-duration: 6.5s; animation-delay: 1s;   background: rgba(255,174,185,0.6); }
+.mc-petal:nth-child(4)  { left: 38%; animation-duration: 9s;   animation-delay: 0.3s; background: rgba(255,182,193,0.7); width: 12px; height: 16px; }
+.mc-petal:nth-child(5)  { left: 48%; animation-duration: 7.5s; animation-delay: 1.5s; background: rgba(255,192,203,0.5); }
+.mc-petal:nth-child(6)  { left: 58%; animation-duration: 8.5s; animation-delay: 0.8s; background: rgba(255,174,185,0.8); width: 9px; height: 12px; }
+.mc-petal:nth-child(7)  { left: 68%; animation-duration: 6.8s; animation-delay: 2s;   background: rgba(255,182,193,0.6); }
+.mc-petal:nth-child(8)  { left: 78%; animation-duration: 7.2s; animation-delay: 0.2s; background: rgba(255,192,203,0.7); width: 11px; height: 15px; }
+.mc-petal:nth-child(9)  { left: 88%; animation-duration: 8.2s; animation-delay: 1.2s; background: rgba(255,174,185,0.5); }
+.mc-petal:nth-child(10) { left: 42%; animation-duration: 7.8s; animation-delay: 2.5s; background: rgba(255,182,193,0.8); width: 7px; height: 10px; }
+
+/* ════════════════════════════════════════════════════════════════════
+   7. CANDLE FLICKER 🕯️
+   ════════════════════════════════════════════════════════════════════ */
+@keyframes mc-flame-flicker {
+  0%, 100% { transform: scaleX(1) scaleY(1); opacity: 0.9; }
+  25% { transform: scaleX(0.9) scaleY(1.05); opacity: 1; }
+  50% { transform: scaleX(1.05) scaleY(0.95); opacity: 0.85; }
+  75% { transform: scaleX(0.95) scaleY(1.02); opacity: 0.95; }
+}
+@keyframes mc-flame-glow {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.25; transform: scale(1.1); }
+}
+
+.mc-candle {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.mc-candle-body {
+  width: 8px;
+  height: 30px;
+  background: linear-gradient(to bottom, #f5e6ca, #e8d5b0);
+  margin: 0 auto;
+  border-radius: 0 0 2px 2px;
+}
+.mc-candle-flame {
+  width: 12px;
+  height: 18px;
+  background: radial-gradient(ellipse at center bottom, #ff9500, #ff6600 40%, #ff3300 70%, transparent 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  margin: 0 auto;
+  animation: mc-flame-flicker 0.8s ease-in-out infinite;
+  position: relative;
+  bottom: 2px;
+}
+.mc-candle-glow {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(255,150,0,0.2), transparent 70%);
+  animation: mc-flame-glow 2s ease-in-out infinite;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   8. TWINKLING STARS ✨
+   ════════════════════════════════════════════════════════════════════ */
+@keyframes mc-twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+.mc-star {
+  position: absolute;
+  color: rgba(255,215,0,0.8);
+  text-shadow: 0 0 4px rgba(255,215,0,0.5);
+  animation: mc-twinkle ease-in-out infinite;
+}
+.mc-star::after { content: '✦'; }
+.mc-star:nth-child(1)  { top: 8%;  left: 12%; font-size: 10px; animation-duration: 3s;   animation-delay: 0s; }
+.mc-star:nth-child(2)  { top: 15%; left: 78%; font-size: 8px;  animation-duration: 4s;   animation-delay: 1s; }
+.mc-star:nth-child(3)  { top: 25%; left: 35%; font-size: 12px; animation-duration: 3.5s; animation-delay: 0.5s; }
+.mc-star:nth-child(4)  { top: 35%; left: 88%; font-size: 7px;  animation-duration: 4.5s; animation-delay: 2s; }
+.mc-star:nth-child(5)  { top: 45%; left: 55%; font-size: 11px; animation-duration: 3.2s; animation-delay: 1.5s; }
+.mc-star:nth-child(6)  { top: 55%; left: 15%; font-size: 9px;  animation-duration: 5s;   animation-delay: 0.8s; }
+.mc-star:nth-child(7)  { top: 65%; left: 70%; font-size: 10px; animation-duration: 3.8s; animation-delay: 2.5s; }
+.mc-star:nth-child(8)  { top: 20%; left: 50%; font-size: 8px;  animation-duration: 4.2s; animation-delay: 3s; }
+.mc-star:nth-child(9)  { top: 40%; left: 25%; font-size: 13px; animation-duration: 3.6s; animation-delay: 0.3s; }
+.mc-star:nth-child(10) { top: 70%; left: 42%; font-size: 7px;  animation-duration: 4.8s; animation-delay: 1.8s; }
+.mc-star:nth-child(11) { top: 12%; left: 62%; font-size: 11px; animation-duration: 3.3s; animation-delay: 3.5s; }
+.mc-star:nth-child(12) { top: 50%; left: 8%;  font-size: 9px;  animation-duration: 4.6s; animation-delay: 0.6s; }
+.mc-star:nth-child(13) { top: 30%; left: 92%; font-size: 10px; animation-duration: 3.9s; animation-delay: 2.2s; }
+.mc-star:nth-child(14) { top: 60%; left: 30%; font-size: 8px;  animation-duration: 5.2s; animation-delay: 1.2s; }
+.mc-star:nth-child(15) { top: 75%; left: 82%; font-size: 12px; animation-duration: 3.4s; animation-delay: 4s; }

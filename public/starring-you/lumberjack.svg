@@ -1,0 +1,404 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <defs>
+    <!-- Face cutout mask -->
+    <mask id="faceMask">
+      <rect width="400" height="500" fill="white"/>
+      <circle cx="185" cy="108" r="42" fill="black"/>
+    </mask>
+
+    <!-- Buffalo plaid pattern -->
+    <pattern id="plaid" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(2)">
+      <rect width="20" height="20" fill="#c1121f"/>
+      <rect width="10" height="10" fill="#1a1a1a"/>
+      <rect x="10" y="10" width="10" height="10" fill="#1a1a1a"/>
+      <rect width="10" height="10" fill="#8b0000" opacity="0.35"/>
+      <rect x="10" y="10" width="10" height="10" fill="#8b0000" opacity="0.35"/>
+      <line x1="0" y1="0" x2="0" y2="20" stroke="#2a0a0a" stroke-width="1.2" opacity="0.25"/>
+      <line x1="10" y1="0" x2="10" y2="20" stroke="#2a0a0a" stroke-width="1.2" opacity="0.25"/>
+      <line x1="0" y1="0" x2="20" y2="0" stroke="#2a0a0a" stroke-width="1.2" opacity="0.25"/>
+      <line x1="0" y1="10" x2="20" y2="10" stroke="#2a0a0a" stroke-width="1.2" opacity="0.25"/>
+    </pattern>
+
+    <!-- Sky gradient -->
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7ec8e3"/>
+      <stop offset="50%" stop-color="#a8d8ea"/>
+      <stop offset="100%" stop-color="#c5dfc0"/>
+    </linearGradient>
+
+    <!-- Mountain gradients -->
+    <linearGradient id="mtFar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8aa89e"/>
+      <stop offset="100%" stop-color="#6a8878"/>
+    </linearGradient>
+    <linearGradient id="mtNear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a7a6e"/>
+      <stop offset="100%" stop-color="#3d5c4a"/>
+    </linearGradient>
+
+    <!-- Tree gradients -->
+    <linearGradient id="treeA" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f2e1a"/>
+      <stop offset="50%" stop-color="#1e4d30"/>
+      <stop offset="100%" stop-color="#0f2e1a"/>
+    </linearGradient>
+    <linearGradient id="treeB" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1a3d25"/>
+      <stop offset="50%" stop-color="#2d6a3f"/>
+      <stop offset="100%" stop-color="#1a3d25"/>
+    </linearGradient>
+
+    <!-- Ground gradient -->
+    <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a7a3a"/>
+      <stop offset="50%" stop-color="#4a6a2a"/>
+      <stop offset="100%" stop-color="#3a5520"/>
+    </linearGradient>
+
+    <!-- Skin gradient -->
+    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0c0a0"/>
+      <stop offset="100%" stop-color="#d4a07a"/>
+    </linearGradient>
+
+    <!-- Toque gradient -->
+    <linearGradient id="toqueGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d42030"/>
+      <stop offset="100%" stop-color="#a01020"/>
+    </linearGradient>
+
+    <!-- Pants gradient -->
+    <linearGradient id="pants" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a3a4a"/>
+      <stop offset="100%" stop-color="#28283a"/>
+    </linearGradient>
+
+    <!-- Boot gradient -->
+    <linearGradient id="boot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b3a1f"/>
+      <stop offset="100%" stop-color="#4a2810"/>
+    </linearGradient>
+
+    <!-- Axe steel -->
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d0d0d0"/>
+      <stop offset="35%" stop-color="#f0f0f0"/>
+      <stop offset="65%" stop-color="#a8a8a8"/>
+      <stop offset="100%" stop-color="#808080"/>
+    </linearGradient>
+
+    <!-- Axe wood handle -->
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8B6914"/>
+      <stop offset="35%" stop-color="#a88030"/>
+      <stop offset="65%" stop-color="#8B6914"/>
+      <stop offset="100%" stop-color="#705010"/>
+    </linearGradient>
+
+    <!-- Stump -->
+    <linearGradient id="stump" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8B6914"/>
+      <stop offset="100%" stop-color="#6b4f10"/>
+    </linearGradient>
+    <linearGradient id="stumpTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d0a858"/>
+      <stop offset="100%" stop-color="#a88030"/>
+    </linearGradient>
+
+    <!-- Suspender -->
+    <linearGradient id="susp" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2a2a2a"/>
+      <stop offset="50%" stop-color="#404040"/>
+      <stop offset="100%" stop-color="#2a2a2a"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    @keyframes breathe {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(1.2px); }
+    }
+    @keyframes axeSway {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(2deg); }
+    }
+    .body { animation: breathe 4s ease-in-out infinite; }
+    .axe { transform-origin: 240px 175px; animation: axeSway 4s ease-in-out infinite; }
+  </style>
+
+  <!-- ============ BACKGROUND ============ -->
+  <rect width="400" height="500" fill="url(#skyGrad)"/>
+
+  <!-- Distant mountains -->
+  <polygon points="-10,290 40,210 90,250 140,190 200,230 260,180 310,220 370,195 410,215 410,290" fill="url(#mtFar)" opacity="0.45"/>
+  <polygon points="-10,310 30,240 80,265 130,218 190,258 245,210 300,248 360,228 410,245 410,310" fill="url(#mtNear)" opacity="0.55"/>
+  <!-- Snow caps -->
+  <polygon points="140,190 152,205 128,205" fill="white" opacity="0.35"/>
+  <polygon points="260,180 270,195 250,195" fill="white" opacity="0.3"/>
+
+  <!-- Background trees (distant, faded) -->
+  <g opacity="0.35">
+    <polygon points="25,290 38,155 51,290" fill="#1a472a"/>
+    <polygon points="48,290 63,135 78,290" fill="#1a472a"/>
+    <polygon points="5,290 15,180 25,290" fill="#1a472a"/>
+    <polygon points="330,290 348,150 366,290" fill="#1a472a"/>
+    <polygon points="355,290 368,165 381,290" fill="#1a472a"/>
+    <polygon points="380,290 392,145 404,290" fill="#1a472a"/>
+  </g>
+
+  <!-- Mid trees -->
+  <g opacity="0.55">
+    <rect x="20" y="210" width="7" height="110" fill="#3d2b1a"/>
+    <polygon points="23,105 -2,225 8,208 -5,245 23,215 51,245 38,208 48,225" fill="url(#treeB)"/>
+    <polygon points="23,140 6,215 23,195 40,215" fill="#1e4d30" opacity="0.6"/>
+
+    <rect x="362" y="200" width="7" height="120" fill="#3d2b1a"/>
+    <polygon points="365,95 340,218 350,200 338,242 365,210 392,242 380,200 390,218" fill="url(#treeB)"/>
+    <polygon points="365,130 350,210 365,192 380,210" fill="#1e4d30" opacity="0.6"/>
+  </g>
+
+  <!-- Ground base -->
+  <ellipse cx="200" cy="415" rx="260" ry="105" fill="url(#groundGrad)"/>
+  <rect x="0" y="375" width="400" height="125" fill="url(#groundGrad)"/>
+
+  <!-- Ground texture -->
+  <ellipse cx="85" cy="395" rx="35" ry="5" fill="#4a6a2a" opacity="0.4"/>
+  <ellipse cx="310" cy="405" rx="30" ry="4" fill="#3d5520" opacity="0.4"/>
+
+  <!-- Foreground tree LEFT -->
+  <rect x="52" y="225" width="9" height="200" fill="#4a3020"/>
+  <rect x="54" y="225" width="5" height="200" fill="#553828" opacity="0.5"/>
+  <polygon points="56,82 20,260 34,235 15,285 56,250 97,285 78,235 92,260" fill="url(#treeA)"/>
+  <polygon points="56,125 32,240 56,215 80,240" fill="#1e4d30" opacity="0.7"/>
+  <polygon points="56,165 40,235 56,220 72,235" fill="#2d6a3f" opacity="0.45"/>
+
+  <!-- Foreground tree RIGHT -->
+  <rect x="338" y="215" width="9" height="210" fill="#4a3020"/>
+  <rect x="340" y="215" width="5" height="210" fill="#553828" opacity="0.5"/>
+  <polygon points="342,72 306,250 320,228 302,278 342,245 382,278 364,228 378,250" fill="url(#treeA)"/>
+  <polygon points="342,115 320,238 342,215 364,238" fill="#1e4d30" opacity="0.7"/>
+  <polygon points="342,155 328,230 342,218 356,230" fill="#2d6a3f" opacity="0.45"/>
+
+  <!-- Tree stump -->
+  <g>
+    <rect x="282" y="360" width="38" height="42" rx="3" fill="url(#stump)"/>
+    <line x1="288" y1="363" x2="288" y2="402" stroke="#5a4010" stroke-width="0.8" opacity="0.4"/>
+    <line x1="296" y1="363" x2="296" y2="402" stroke="#5a4010" stroke-width="0.8" opacity="0.4"/>
+    <line x1="304" y1="363" x2="304" y2="402" stroke="#5a4010" stroke-width="0.8" opacity="0.4"/>
+    <line x1="312" y1="363" x2="312" y2="402" stroke="#5a4010" stroke-width="0.8" opacity="0.4"/>
+    <ellipse cx="301" cy="360" rx="21" ry="7" fill="url(#stumpTop)" stroke="#7a5a18" stroke-width="0.5"/>
+    <ellipse cx="301" cy="360" rx="15" ry="5" fill="none" stroke="#8a6520" stroke-width="0.7" opacity="0.5"/>
+    <ellipse cx="301" cy="360" rx="9" ry="3.2" fill="none" stroke="#8a6520" stroke-width="0.7" opacity="0.5"/>
+    <ellipse cx="301" cy="360" rx="4" ry="1.8" fill="none" stroke="#8a6520" stroke-width="0.7" opacity="0.5"/>
+    <circle cx="301" cy="360" r="1.2" fill="#7a5a18"/>
+  </g>
+
+  <!-- Wood chips -->
+  <g fill="#b89040" opacity="0.65">
+    <rect x="272" y="398" width="5" height="2.5" rx="1" transform="rotate(-20 274 399)"/>
+    <rect x="312" y="396" width="4.5" height="2" rx="1" transform="rotate(18 314 397)"/>
+    <rect x="292" y="406" width="6" height="2" rx="1" transform="rotate(-30 295 407)"/>
+    <rect x="324" y="403" width="4" height="2" rx="1" transform="rotate(42 326 404)"/>
+    <rect x="268" y="404" width="5" height="2" rx="1" transform="rotate(12 270 405)"/>
+    <rect x="307" y="410" width="5.5" height="2" rx="1" transform="rotate(-22 309 411)"/>
+    <rect x="283" y="393" width="3.5" height="2" rx="1" transform="rotate(50 284 394)"/>
+  </g>
+  <ellipse cx="301" cy="404" rx="16" ry="3.5" fill="#c8a050" opacity="0.28"/>
+
+  <!-- ============ CHARACTER (with face mask) ============ -->
+  <g mask="url(#faceMask)">
+    <g class="body">
+
+      <!-- Neck -->
+      <rect x="173" y="140" width="24" height="22" rx="4" fill="url(#skin)"/>
+
+      <!-- ---- TOQUE / BEANIE ---- -->
+      <g>
+        <path d="M153,82 Q153,48 185,43 Q217,48 217,82 Z" fill="url(#toqueGrad)"/>
+        <!-- Knit ribbing on toque body -->
+        <line x1="163" y1="55" x2="160" y2="82" stroke="#b01828" stroke-width="1" opacity="0.3"/>
+        <line x1="175" y1="50" x2="173" y2="82" stroke="#b01828" stroke-width="1" opacity="0.3"/>
+        <line x1="185" y1="48" x2="185" y2="82" stroke="#b01828" stroke-width="1" opacity="0.3"/>
+        <line x1="195" y1="50" x2="197" y2="82" stroke="#b01828" stroke-width="1" opacity="0.3"/>
+        <line x1="207" y1="55" x2="210" y2="82" stroke="#b01828" stroke-width="1" opacity="0.3"/>
+        <!-- Cuff/brim -->
+        <rect x="152" y="76" width="66" height="13" rx="6" fill="#d42030"/>
+        <rect x="152" y="76" width="66" height="13" rx="6" fill="none" stroke="#b01828" stroke-width="0.5"/>
+        <!-- Cuff knit lines -->
+        <line x1="159" y1="78" x2="159" y2="88" stroke="#b81c28" stroke-width="0.6" opacity="0.4"/>
+        <line x1="166" y1="78" x2="166" y2="88" stroke="#b81c28" stroke-width="0.6" opacity="0.4"/>
+        <line x1="173" y1="78" x2="173" y2="88" stroke="#b81c28" stroke-width="0.6" opacity="0.4"/>
+        <line x1="180" y1="78" x2="180" y2="88" stroke="#b81c28" stroke-width="0.6" opacity="0.4"/>
+        <line x1="187" y1="78" x2="187" y2="88" stroke="#b81c28" stroke-width="0.6" opacity="0.4"/>
+        <line x1="194" y1="78" x2="194" y2="88" stroke="#b81c28" stroke-width="0.6" opacity="0.4"/>
+        <line x1="201" y1="78" x2="201" y2="88" stroke="#b81c28" stroke-width="0.6" opacity="0.4"/>
+        <line x1="208" y1="78" x2="208" y2="88" stroke="#b81c28" stroke-width="0.6" opacity="0.4"/>
+        <!-- Pompom -->
+        <circle cx="185" cy="43" r="8" fill="#e63946"/>
+        <circle cx="182" cy="40" r="2.5" fill="#f06070" opacity="0.4"/>
+        <circle cx="188" cy="42" r="1.8" fill="#f06070" opacity="0.3"/>
+      </g>
+
+      <!-- Head shape (skin visible around face hole) -->
+      <ellipse cx="185" cy="108" rx="48" ry="50" fill="url(#skin)"/>
+
+      <!-- Ears -->
+      <ellipse cx="137" cy="110" rx="7" ry="10" fill="#d4a07a"/>
+      <ellipse cx="137" cy="110" rx="4" ry="6" fill="#c09070" opacity="0.4"/>
+      <ellipse cx="233" cy="110" rx="7" ry="10" fill="#d4a07a"/>
+      <ellipse cx="233" cy="110" rx="4" ry="6" fill="#c09070" opacity="0.4"/>
+
+      <!-- Stubble shadow around jaw -->
+      <path d="M155,140 Q165,158 185,162 Q205,158 215,140" fill="#8a6545" opacity="0.1"/>
+
+      <!-- ---- PLAID FLANNEL SHIRT ---- -->
+      <path d="M138,157 L130,165 Q115,178 113,205 L110,295 Q110,305 125,305 L245,305 Q260,305 260,295 L257,205 Q255,178 240,165 L232,157 Q215,152 185,150 Q155,152 138,157 Z" fill="url(#plaid)"/>
+
+      <!-- Collar -->
+      <path d="M163,153 L174,144 L184,156 L185,154 L186,156 L196,144 L207,153" fill="none" stroke="#800" stroke-width="1.5"/>
+      <path d="M166,152 L176,143 L184,155" fill="#c1121f" opacity="0.6"/>
+      <path d="M204,152 L194,143 L186,155" fill="#c1121f" opacity="0.6"/>
+
+      <!-- Shirt depth shading -->
+      <path d="M138,157 L130,165 Q115,178 113,205 L110,295 Q110,305 125,305 L140,305 L143,165 Z" fill="#000" opacity="0.07"/>
+      <path d="M232,157 L240,165 Q255,178 257,205 L260,295 Q260,305 245,305 L230,305 L227,165 Z" fill="#000" opacity="0.07"/>
+
+      <!-- Button line -->
+      <line x1="185" y1="160" x2="185" y2="300" stroke="#1a1a1a" stroke-width="0.8" opacity="0.25"/>
+      <circle cx="185" cy="178" r="2.2" fill="#2a2a2a"/>
+      <circle cx="185" cy="200" r="2.2" fill="#2a2a2a"/>
+      <circle cx="185" cy="222" r="2.2" fill="#2a2a2a"/>
+      <circle cx="185" cy="244" r="2.2" fill="#2a2a2a"/>
+      <circle cx="185" cy="266" r="2.2" fill="#2a2a2a"/>
+      <circle cx="185" cy="288" r="2.2" fill="#2a2a2a"/>
+
+      <!-- ---- ROLLED SLEEVES ---- -->
+      <!-- Left sleeve -->
+      <path d="M113,200 Q100,202 95,218 L90,242 Q88,252 95,255 L115,257 Q122,254 122,246 L125,218 Q126,204 118,200 Z" fill="url(#plaid)"/>
+      <!-- Left cuff roll -->
+      <path d="M92,240 Q88,240 88,246 L88,252 Q88,256 95,256 L115,258 Q122,256 122,252 L122,246 Q122,240 118,240 Z" fill="#c1121f" stroke="#900" stroke-width="0.4"/>
+
+      <!-- Right sleeve -->
+      <path d="M257,200 Q270,202 275,218 L280,242 Q282,252 275,255 L255,257 Q248,254 248,246 L245,218 Q244,204 252,200 Z" fill="url(#plaid)"/>
+      <!-- Right cuff roll -->
+      <path d="M278,240 Q282,240 282,246 L282,252 Q282,256 275,256 L255,258 Q248,256 248,252 L248,246 Q248,240 252,240 Z" fill="#c1121f" stroke="#900" stroke-width="0.4"/>
+
+      <!-- ---- SUSPENDERS ---- -->
+      <!-- Left suspender -->
+      <path d="M160,160 L155,162 L150,300 L158,300 L163,162 Z" fill="url(#susp)"/>
+      <!-- Buckle -->
+      <rect x="149" y="296" width="10" height="7" rx="1.5" fill="#aaa" stroke="#777" stroke-width="0.5"/>
+      <rect x="152" y="298" width="4" height="3" rx="0.5" fill="#888"/>
+      <!-- Right suspender -->
+      <path d="M210,160 L215,162 L220,300 L212,300 L207,162 Z" fill="url(#susp)"/>
+      <rect x="211" y="296" width="10" height="7" rx="1.5" fill="#aaa" stroke="#777" stroke-width="0.5"/>
+      <rect x="214" y="298" width="4" height="3" rx="0.5" fill="#888"/>
+
+      <!-- ---- MUSCULAR FOREARMS ---- -->
+      <!-- Left forearm -->
+      <path d="M90,255 Q84,264 82,278 Q80,292 85,298 L102,300 Q110,297 108,282 L112,262 Q114,255 106,255 Z" fill="url(#skin)"/>
+      <path d="M94,265 Q91,275 92,288" fill="none" stroke="#c09070" stroke-width="1" opacity="0.35"/>
+      <path d="M102,262 Q100,272 101,286" fill="none" stroke="#c09070" stroke-width="0.8" opacity="0.25"/>
+
+      <!-- Right forearm -->
+      <path d="M280,255 Q286,264 288,278 Q290,292 285,298 L268,300 Q260,297 262,282 L258,262 Q256,255 264,255 Z" fill="url(#skin)"/>
+      <path d="M276,265 Q279,275 278,288" fill="none" stroke="#c09070" stroke-width="1" opacity="0.35"/>
+      <path d="M268,262 Q270,272 269,286" fill="none" stroke="#c09070" stroke-width="0.8" opacity="0.25"/>
+
+      <!-- ---- HANDS ---- -->
+      <!-- Left hand -->
+      <ellipse cx="88" cy="302" rx="10" ry="8" fill="#d4a07a"/>
+      <path d="M80,297 Q76,302 80,307" fill="none" stroke="#b88060" stroke-width="1.3"/>
+      <path d="M83,295 Q79,299 81,305" fill="none" stroke="#b88060" stroke-width="1" opacity="0.5"/>
+
+      <!-- Right hand (at side) -->
+      <ellipse cx="282" cy="302" rx="10" ry="8" fill="#d4a07a"/>
+      <path d="M290,297 Q294,302 290,307" fill="none" stroke="#b88060" stroke-width="1.3"/>
+
+      <!-- ---- BELT ---- -->
+      <rect x="122" y="298" width="126" height="11" rx="2" fill="#3a2a1a"/>
+      <rect x="122" y="298" width="126" height="11" rx="2" fill="none" stroke="#2a1a0a" stroke-width="0.5"/>
+      <!-- Belt buckle -->
+      <rect x="177" y="297" width="16" height="13" rx="2.5" fill="#c0a040" stroke="#a08020" stroke-width="0.8"/>
+      <rect x="181" y="300" width="8" height="7" rx="1" fill="none" stroke="#a08020" stroke-width="0.6"/>
+
+      <!-- ---- DARK WORK PANTS ---- -->
+      <!-- Left leg -->
+      <path d="M128,308 L124,395 Q124,400 132,400 L172,400 Q177,400 177,395 L178,308 Z" fill="url(#pants)"/>
+      <!-- Right leg -->
+      <path d="M192,308 L192,395 Q192,400 197,400 L238,400 Q243,400 243,395 L246,308 Z" fill="url(#pants)"/>
+      <!-- Pant details -->
+      <line x1="153" y1="315" x2="150" y2="395" stroke="#2a2a38" stroke-width="0.7" opacity="0.3"/>
+      <line x1="217" y1="315" x2="220" y2="395" stroke="#2a2a38" stroke-width="0.7" opacity="0.3"/>
+      <!-- Knee wear -->
+      <ellipse cx="150" cy="360" rx="14" ry="8" fill="#444458" opacity="0.1"/>
+      <ellipse cx="218" cy="360" rx="14" ry="8" fill="#444458" opacity="0.1"/>
+
+      <!-- ---- HEAVY WORK BOOTS ---- -->
+      <!-- Left boot -->
+      <path d="M122,393 L120,418 Q119,425 112,427 L108,427 Q103,427 103,422 L103,418 Q103,413 110,411 L118,409 L120,398 L176,398 L176,409 L172,418 Q168,427 160,427 L138,427 Q128,427 126,418 Z" fill="url(#boot)"/>
+      <path d="M120,398 L176,398 L176,403 L120,403 Z" fill="#5a2a10" opacity="0.4"/>
+      <!-- Boot stitching -->
+      <line x1="148" y1="403" x2="148" y2="422" stroke="#2a1a0a" stroke-width="0.7"/>
+      <line x1="142" y1="407" x2="154" y2="407" stroke="#2a1a0a" stroke-width="0.5"/>
+      <line x1="142" y1="412" x2="154" y2="412" stroke="#2a1a0a" stroke-width="0.5"/>
+      <line x1="142" y1="417" x2="154" y2="417" stroke="#2a1a0a" stroke-width="0.5"/>
+      <!-- Left sole -->
+      <path d="M106,424 L106,431 Q106,435 112,435 L166,435 Q173,435 173,431 L173,424" fill="#2a1a0a"/>
+
+      <!-- Right boot -->
+      <path d="M190,393 L192,418 Q193,425 200,427 L204,427 Q209,427 209,422 L209,418 Q209,413 202,411 L194,409 L192,398 L242,398 L243,409 L246,418 Q249,427 241,427 L220,427 Q210,427 208,418 Z" fill="url(#boot)"/>
+      <path d="M192,398 L242,398 L243,403 L192,403 Z" fill="#5a2a10" opacity="0.4"/>
+      <line x1="217" y1="403" x2="217" y2="422" stroke="#2a1a0a" stroke-width="0.7"/>
+      <line x1="211" y1="407" x2="223" y2="407" stroke="#2a1a0a" stroke-width="0.5"/>
+      <line x1="211" y1="412" x2="223" y2="412" stroke="#2a1a0a" stroke-width="0.5"/>
+      <line x1="211" y1="417" x2="223" y2="417" stroke="#2a1a0a" stroke-width="0.5"/>
+      <!-- Right sole -->
+      <path d="M194,424 L194,431 Q194,435 200,435 L248,435 Q254,435 254,431 L254,424" fill="#2a1a0a"/>
+
+    </g>
+  </g>
+
+  <!-- ============ AXE (outside mask, over shoulder) ============ -->
+  <g class="axe">
+    <!-- Handle -->
+    <line x1="85" y1="304" x2="252" y2="55" stroke="url(#wood)" stroke-width="7" stroke-linecap="round"/>
+    <!-- Wood grain -->
+    <line x1="88" y1="300" x2="250" y2="58" stroke="#705010" stroke-width="0.5" opacity="0.35"/>
+    <line x1="83" y1="306" x2="248" y2="62" stroke="#a07828" stroke-width="0.4" opacity="0.25"/>
+    <!-- Grip wrap at base -->
+    <line x1="83" y1="308" x2="91" y2="296" stroke="#4a3010" stroke-width="1.8" opacity="0.35"/>
+    <line x1="81" y1="312" x2="88" y2="302" stroke="#4a3010" stroke-width="1.8" opacity="0.35"/>
+
+    <!-- Double-bit axe head -->
+    <g transform="translate(252,55) rotate(-57)">
+      <!-- Blade 1 (top) -->
+      <path d="M-2,-6 L-10,-6 Q-32,-7 -38,-28 L-32,-32 Q-22,-16 -6,-12 L-2,-12 Z" fill="url(#steel)" stroke="#666" stroke-width="0.6"/>
+      <path d="M-38,-28 L-32,-32" stroke="#e8e8e8" stroke-width="1.8"/>
+      <!-- Blade 2 (bottom) -->
+      <path d="M-2,6 L-10,6 Q-32,7 -38,28 L-32,32 Q-22,16 -6,12 L-2,12 Z" fill="url(#steel)" stroke="#666" stroke-width="0.6"/>
+      <path d="M-38,28 L-32,32" stroke="#e8e8e8" stroke-width="1.8"/>
+      <!-- Eye socket -->
+      <ellipse cx="0" cy="0" rx="7" ry="9" fill="#999" stroke="#666" stroke-width="1"/>
+      <ellipse cx="0" cy="0" rx="4" ry="5.5" fill="url(#wood)"/>
+      <!-- Steel highlights -->
+      <path d="M-12,-9 Q-24,-10 -30,-20" fill="none" stroke="#fff" stroke-width="0.7" opacity="0.45"/>
+      <path d="M-12,9 Q-24,10 -30,20" fill="none" stroke="#fff" stroke-width="0.7" opacity="0.45"/>
+    </g>
+  </g>
+
+  <!-- Transparent face hole (no fill, no stroke - purely transparent) -->
+  <circle cx="185" cy="108" r="42" fill="none"/>
+
+  <!-- Scattered pine needles on ground -->
+  <g stroke="#2d5a3f" stroke-width="0.8" opacity="0.25">
+    <line x1="102" y1="392" x2="110" y2="390"/>
+    <line x1="255" y1="400" x2="263" y2="398"/>
+    <line x1="148" y1="412" x2="155" y2="410"/>
+    <line x1="200" y1="420" x2="206" y2="418"/>
+  </g>
+
+  <!-- ============ CAPTION ============ -->
+  <text x="200" y="475" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="bold" fill="#e63946" letter-spacing="3" style="text-transform:uppercase">BUILT DIFFERENT</text>
+
+</svg>
