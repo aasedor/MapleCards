@@ -2,80 +2,50 @@
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 
-const RED = '#c0392b';
-const RED_DARK = '#8b1a1a';
-const CREAM = '#faf8f3';
-const FONT_UI = "var(--font-dm-sans), 'DM Sans', sans-serif";
-const FONT_HEADLINE = "var(--font-playfair), 'Playfair Display', serif";
-
-interface Character {
+interface Scene {
   id: string;
   name: string;
-  svg: string;
   caption: string;
-  cardText: string;
-  faceX: number;
-  faceY: number;
-  faceRadius: number;
+  occasion: string;
+  insideText: string;
+  thumbnail: string;
+  template: string;
+  duration: number;
 }
-
-const CHARACTERS: Character[] = [
-  {
-    id: 'hockey-hero',
-    name: 'Hockey Hero',
-    svg: '/starring-you/hockey-hero.svg',
-    caption: 'GOAL!',
-    cardText: 'Happy Birthday, {name}!',
-    faceX: 200, faceY: 105, faceRadius: 45,
-  },
-  {
-    id: 'mountie',
-    name: 'The Mountie',
-    svg: '/starring-you/mountie.svg',
-    caption: 'THE MOUNTIES ALWAYS GET THEIR MAN',
-    cardText: 'Congratulations!',
-    faceX: 200, faceY: 108, faceRadius: 42,
-  },
-  {
-    id: 'zamboni',
-    name: 'Zamboni Driver',
-    svg: '/starring-you/zamboni.svg',
-    caption: "WORLD'S GREATEST DAD",
-    cardText: "Happy Father's Day!",
-    faceX: 235, faceY: 145, faceRadius: 40,
-  },
-  {
-    id: 'moose-rider',
-    name: 'Moose Rider',
-    svg: '/starring-you/moose-rider.svg',
-    caption: 'LIVING THEIR BEST CANADIAN LIFE',
-    cardText: 'Happy Birthday!',
-    faceX: 200, faceY: 95, faceRadius: 40,
-  },
-  {
-    id: 'lumberjack',
-    name: 'Lumberjack',
-    svg: '/starring-you/lumberjack.svg',
-    caption: 'BUILT DIFFERENT',
-    cardText: 'Congratulations!',
-    faceX: 185, faceY: 108, faceRadius: 42,
-  },
-];
 
 interface StarringYouProps {
-  onSelect: (imageDataUrl: string) => void;
-  recipientName: string;
+  isPremium: boolean;
+  onUpgradeClick: () => void;
+  onVideoReady: (videoUrl: string, message: string, imageUrl?: string) => void;
 }
 
-export default function StarringYou({ onSelect, recipientName }: StarringYouProps) {
-  const [selectedChar, setSelectedChar] = useState<Character>(CHARACTERS[0]);
-  const [faceImage, setFaceImage] = useState<string | null>(null);
+export default function StarringYou({
+  isPremium,
+  onUpgradeClick,
+  onVideoReady,
+}: StarringYouProps) {
+  const [scenes, setScenes] = useState<Scene[]>([]);
+  const [selectedScene, setSelectedScene] = useState<Scene | null>(null);
+  const [facePreview, setFacePreview] = useState<string | null>(null);
+  const [faceBase64, setFaceBase64] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [swapping, setSwapping] = useState(false);
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resultVideoUrl, setResultVideoUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const faceApiRef = useRef<typeof import('face-api.js') | null>(null);
+
+  // Load scenes config
+  useEffect(() => {
+    fetch('/veo-templates/scenes.json')
+      .then((r) => r.json())
+      .then((data: Scene[]) => {
+        setScenes(data);
+        if (data.length > 0) setSelectedScene(data[0]);
+      })
+      .catch(() => setError('Failed to load scenes'));
+  }, []);
 
   // Load face-api.js models
   useEffect(() => {
@@ -85,172 +55,220 @@ export default function StarringYou({ onSelect, recipientName }: StarringYouProp
         const faceapi = await import('face-api.js');
         faceApiRef.current = faceapi;
         await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-        await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
         if (!cancelled) setModelsLoaded(true);
       } catch {
-        if (!cancelled) setError('Could not load face detection models. Upload will crop centre instead.');
-        if (!cancelled) setModelsLoaded(true); // allow fallback
+        if (!cancelled) {
+          setModelsLoaded(true); // allow without detection
+        }
       }
     }
     loadModels();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setProcessing(true);
-    setError(null);
+  const handleFileUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setProcessing(true);
+      setError(null);
+      setResultVideoUrl(null);
 
-    try {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-      img.src = url;
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error('Failed to load image'));
-      });
+      try {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.src = url;
+        await new Promise<void>((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error('Failed to load image'));
+        });
 
-      // Detect face or fallback to centre crop
-      let cropX = img.width / 2;
-      let cropY = img.height / 2;
-      let cropSize = Math.min(img.width, img.height) * 0.5;
+        // Detect face
+        const faceapi = faceApiRef.current;
+        let cropX = img.width / 2;
+        let cropY = img.height / 2;
+        let cropSize = Math.min(img.width, img.height) * 0.6;
 
-      const faceapi = faceApiRef.current;
-      if (faceapi) {
-        try {
-          const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks();
-          if (detection) {
-            const box = detection.detection.box;
-            cropX = box.x + box.width / 2;
-            cropY = box.y + box.height / 2;
-            cropSize = Math.max(box.width, box.height) * 1.05;
+        if (faceapi) {
+          const detection = await faceapi.detectSingleFace(
+            img,
+            new faceapi.TinyFaceDetectorOptions()
+          );
+          if (!detection) {
+            setError('No face detected. Please upload a clear front-facing photo.');
+            URL.revokeObjectURL(url);
+            setProcessing(false);
+            return;
           }
-        } catch {
-          // fallback to centre
+          const box = detection.box;
+          cropX = box.x + box.width / 2;
+          cropY = box.y + box.height / 2;
+          cropSize = Math.max(box.width, box.height) * 1.4;
         }
+
+        // Crop face into circle for preview
+        const previewSize = 120;
+        const previewCanvas = document.createElement('canvas');
+        previewCanvas.width = previewSize;
+        previewCanvas.height = previewSize;
+        const pCtx = previewCanvas.getContext('2d')!;
+        pCtx.beginPath();
+        pCtx.arc(previewSize / 2, previewSize / 2, previewSize / 2, 0, Math.PI * 2);
+        pCtx.closePath();
+        pCtx.clip();
+        const sx = cropX - cropSize / 2;
+        const sy = cropY - cropSize / 2;
+        pCtx.drawImage(img, sx, sy, cropSize, cropSize, 0, 0, previewSize, previewSize);
+        setFacePreview(previewCanvas.toDataURL('image/png'));
+
+        // Full image for the API (resized to max 1024px)
+        const fullCanvas = document.createElement('canvas');
+        const maxDim = 1024;
+        const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
+        fullCanvas.width = img.width * scale;
+        fullCanvas.height = img.height * scale;
+        const fCtx = fullCanvas.getContext('2d')!;
+        fCtx.drawImage(img, 0, 0, fullCanvas.width, fullCanvas.height);
+        setFaceBase64(fullCanvas.toDataURL('image/jpeg', 0.9));
+
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to process image');
+      } finally {
+        setProcessing(false);
       }
+    },
+    []
+  );
 
-      // Crop face into circle using canvas
-      const size = 200;
-      const canvas = document.createElement('canvas');
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext('2d')!;
-
-      // Draw circular clip
-      ctx.beginPath();
-      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-      ctx.closePath();
-      ctx.clip();
-
-      // Draw cropped face
-      const sx = cropX - cropSize / 2;
-      const sy = cropY - cropSize / 2;
-      ctx.drawImage(img, sx, sy, cropSize, cropSize, 0, 0, size, size);
-
-      const faceDataUrl = canvas.toDataURL('image/png');
-      setFaceImage(faceDataUrl);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to process image');
-    } finally {
-      setProcessing(false);
-    }
-  }, []);
-
-  const generateCard = useCallback(async () => {
-    if (!faceImage) return;
-    setProcessing(true);
+  const startSwap = useCallback(async () => {
+    if (!faceBase64 || !selectedScene) return;
+    setSwapping(true);
+    setError(null);
+    setResultVideoUrl(null);
 
     try {
-      // Compose: SVG background + face overlay → canvas → data URL
-      const canvas = document.createElement('canvas');
-      canvas.width = 400;
-      canvas.height = 500;
-      const ctx = canvas.getContext('2d')!;
-
-      // Draw white background
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(0, 0, 400, 500);
-
-      // Load and draw SVG
-      const svgImg = new Image();
-      svgImg.crossOrigin = 'anonymous';
-      svgImg.src = selectedChar.svg;
-      await new Promise<void>((resolve) => {
-        svgImg.onload = () => resolve();
-        svgImg.onerror = () => resolve(); // continue even if SVG fails
+      const res = await fetch('/api/starring-you', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sceneId: selectedScene.id,
+          userPhotoBase64: faceBase64,
+        }),
       });
-      ctx.drawImage(svgImg, 0, 0, 400, 500);
 
-      // Draw face in the hole
-      const faceImg = new Image();
-      faceImg.src = faceImage;
-      await new Promise<void>((resolve) => { faceImg.onload = () => resolve(); });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
 
-      const r = selectedChar.faceRadius;
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(selectedChar.faceX, selectedChar.faceY, r, 0, Math.PI * 2);
-      ctx.closePath();
-      ctx.clip();
-      ctx.drawImage(faceImg, selectedChar.faceX - r, selectedChar.faceY - r, r * 2, r * 2);
-      ctx.restore();
-
-      // Add caption text
-      const name = recipientName || 'Friend';
-      const text = selectedChar.cardText.replace('{name}', name);
-      ctx.fillStyle = RED;
-      ctx.font = "bold 18px 'Playfair Display', serif";
-      ctx.textAlign = 'center';
-      ctx.fillText(text, 200, 480);
-
-      const dataUrl = canvas.toDataURL('image/png');
-      onSelect(dataUrl);
+      setResultVideoUrl(data.imageUrl);
+      onVideoReady(data.videoUrl, selectedScene.insideText, data.imageUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate card');
+      setError(err instanceof Error ? err.message : 'Face swap failed');
     } finally {
-      setProcessing(false);
+      setSwapping(false);
     }
-  }, [faceImage, selectedChar, recipientName, onSelect]);
+  }, [faceBase64, selectedScene, onVideoReady]);
+
+  const resetPhoto = () => {
+    setFacePreview(null);
+    setFaceBase64(null);
+    setResultVideoUrl(null);
+    setError(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // Premium gate
+  if (!isPremium) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <div style={{ fontSize: '48px', marginBottom: '12px' }}>🎭</div>
+        <h3 style={{ margin: '0 0 8px', color: '#333', fontSize: '18px', fontWeight: 'bold' }}>
+          Starring You
+        </h3>
+        <p style={{ color: '#666', fontSize: '14px', margin: '0 0 16px', lineHeight: 1.5 }}>
+          Upload your photo and star in your own animated greeting card! Face swap powered by AI.
+        </p>
+        <button
+          onClick={onUpgradeClick}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: '#DC143C',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+          }}
+        >
+          Upgrade to Premium
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ marginBottom: '20px' }}>
-      <label style={{ display: 'block', marginBottom: '8px', fontWeight: 700, color: '#333', fontSize: '13px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-        Starring You
-      </label>
-
-      {/* Character picker */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-        {CHARACTERS.map((ch) => (
-          <button
-            key={ch.id}
-            onClick={() => setSelectedChar(ch)}
-            style={{
-              padding: '8px',
-              border: selectedChar.id === ch.id ? `3px solid ${RED}` : '2px solid #ddd',
-              backgroundColor: selectedChar.id === ch.id ? '#fff' : CREAM,
-              borderRadius: '0',
-              cursor: 'pointer',
-              fontSize: '11px',
-              fontWeight: 700,
-              fontFamily: FONT_UI,
-              textAlign: 'center',
-              boxShadow: selectedChar.id === ch.id ? `4px 4px 0 ${RED_DARK}` : 'none',
-              transition: 'all 0.15s',
-            }}
-          >
-            <div style={{ fontFamily: FONT_HEADLINE, fontSize: '10px', color: RED, marginBottom: '2px' }}>
-              {ch.caption}
-            </div>
-            <div>{ch.name}</div>
-          </button>
-        ))}
+    <div style={{ padding: '0' }}>
+      {/* Scene Picker */}
+      <div style={{ marginBottom: '16px' }}>
+        <label
+          style={{
+            display: 'block',
+            marginBottom: '8px',
+            fontWeight: 'bold',
+            color: '#333',
+            fontSize: '13px',
+            letterSpacing: '0.5px',
+            textTransform: 'uppercase',
+          }}
+        >
+          Choose a Scene
+        </label>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          {scenes.map((scene) => (
+            <button
+              key={scene.id}
+              onClick={() => {
+                setSelectedScene(scene);
+                setResultVideoUrl(null);
+              }}
+              style={{
+                padding: '10px 8px',
+                border:
+                  selectedScene?.id === scene.id
+                    ? '2px solid #DC143C'
+                    : '2px solid #ddd',
+                backgroundColor:
+                  selectedScene?.id === scene.id ? '#fff' : '#fafafa',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '11px',
+                fontWeight: 'bold',
+                textAlign: 'center',
+                transition: 'all 0.2s',
+              }}
+            >
+              <div style={{ fontSize: '24px', marginBottom: '4px' }}>🎬</div>
+              <div style={{ fontSize: '11px', fontWeight: 'bold' }}>{scene.name}</div>
+              <div
+                style={{
+                  fontSize: '9px',
+                  color: '#DC143C',
+                  marginTop: '2px',
+                  fontWeight: 'bold',
+                  letterSpacing: '0.3px',
+                }}
+              >
+                {scene.caption}
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Upload button */}
+      {/* Upload Photo */}
       <input
         ref={fileInputRef}
         type="file"
@@ -258,71 +276,149 @@ export default function StarringYou({ onSelect, recipientName }: StarringYouProp
         onChange={handleFileUpload}
         style={{ display: 'none' }}
       />
-      <button
-        onClick={() => fileInputRef.current?.click()}
-        disabled={processing}
-        style={{
-          width: '100%',
-          padding: '12px',
-          backgroundColor: '#fff',
-          color: RED,
-          border: `2px solid ${RED}`,
-          borderRadius: '0',
-          fontSize: '13px',
-          fontWeight: 700,
-          fontFamily: FONT_UI,
-          cursor: processing ? 'not-allowed' : 'pointer',
-          marginBottom: '10px',
-          boxShadow: `4px 4px 0 ${RED_DARK}`,
-        }}
-      >
-        {processing ? 'Processing...' : faceImage ? 'Change Photo' : 'Upload a Photo'}
-      </button>
 
-      {/* Status */}
-      {!modelsLoaded && !error && (
-        <p style={{ fontSize: '11px', color: '#999', margin: '0 0 8px 0' }}>Loading face detection...</p>
-      )}
-      {error && (
-        <p style={{ fontSize: '11px', color: RED, margin: '0 0 8px 0' }}>{error}</p>
-      )}
-
-      {/* Face preview */}
-      {faceImage && (
-        <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-          <img
-            src={faceImage}
-            alt="Detected face"
-            style={{ width: '80px', height: '80px', borderRadius: '50%', border: `3px solid ${RED}` }}
-          />
-          <p style={{ fontSize: '11px', color: '#666', margin: '4px 0 0 0' }}>Face detected</p>
-        </div>
-      )}
-
-      {/* Use this card button */}
-      {faceImage && (
+      {!facePreview && (
         <button
-          onClick={generateCard}
-          disabled={processing}
+          onClick={() => fileInputRef.current?.click()}
+          disabled={processing || !modelsLoaded || !selectedScene}
           style={{
             width: '100%',
-            padding: '12px',
-            backgroundColor: RED,
-            color: '#fff',
-            border: 'none',
-            borderRadius: '0',
-            fontSize: '13px',
-            fontWeight: 700,
-            fontFamily: FONT_UI,
-            cursor: processing ? 'not-allowed' : 'pointer',
-            boxShadow: `4px 4px 0 ${RED_DARK}`,
+            padding: '14px',
+            backgroundColor: '#fff',
+            color: '#DC143C',
+            border: '2px solid #DC143C',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            cursor:
+              processing || !modelsLoaded || !selectedScene
+                ? 'not-allowed'
+                : 'pointer',
+            marginBottom: '12px',
           }}
         >
-          {processing ? 'Generating...' : 'Use This as My Card'}
+          {!modelsLoaded
+            ? 'Loading face detection...'
+            : processing
+              ? 'Detecting face...'
+              : '📷 Upload Your Photo'}
         </button>
       )}
 
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
+      {/* Face Preview */}
+      {facePreview && !resultVideoUrl && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '12px',
+            padding: '12px',
+            border: '2px solid #eee',
+            borderRadius: '8px',
+            backgroundColor: '#fafafa',
+          }}
+        >
+          <img
+            src={facePreview}
+            alt="Your face"
+            style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              border: '3px solid #DC143C',
+            }}
+          />
+          <div style={{ flex: 1 }}>
+            {!swapping ? (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={startSwap}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    backgroundColor: '#DC143C',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Create My Card
+                </button>
+                <button
+                  onClick={resetPhoto}
+                  style={{
+                    padding: '10px 14px',
+                    backgroundColor: '#fff',
+                    color: '#999',
+                    border: '2px solid #ddd',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Change
+                </button>
+              </div>
+            ) : (
+              <div
+                style={{
+                  textAlign: 'center',
+                  color: '#DC143C',
+                  fontWeight: 'bold',
+                  fontSize: '13px',
+                }}
+              >
+                Creating your card... 🍁
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Result Video */}
+      {resultVideoUrl && (
+        <div style={{ marginBottom: '12px' }}>
+          <img
+            src={resultVideoUrl}
+            alt="Your face-swapped card"
+            style={{
+              width: '100%',
+              borderRadius: '8px',
+              border: '2px solid #DC143C',
+            }}
+          />
+          <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+            <button
+              onClick={resetPhoto}
+              style={{
+                flex: 1,
+                padding: '10px',
+                backgroundColor: '#fff',
+                color: '#DC143C',
+                border: '2px solid #DC143C',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <p style={{ fontSize: '12px', color: '#DC143C', margin: '8px 0 0', fontWeight: 'bold' }}>
+          {error}
+        </p>
+      )}
     </div>
   );
 }

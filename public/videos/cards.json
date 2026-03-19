@@ -1,0 +1,72 @@
+[
+  {
+    "id": "t-honk",
+    "name": "T-Honk You Goose",
+    "occasion": "thank-you",
+    "insideText": "I can't say it loud enough... T-HONK YOU!",
+    "video": "/videos/t-honk.mp4"
+  },
+  {
+    "id": "bonhomme",
+    "name": "Bonhomme Breakdance",
+    "occasion": "birthday",
+    "insideText": "Time to bust out the winter moves. Wishing you the happiest of birthdays!",
+    "video": "/videos/bonhomme.mp4"
+  },
+  {
+    "id": "syrup-iv",
+    "name": "Maple Syrup IV",
+    "occasion": "get-well",
+    "insideText": "Pumping you full of the good stuff. Get well soon, eh?",
+    "video": "/videos/syrup-iv.mp4"
+  },
+  {
+    "id": "beaver-architect",
+    "name": "The Beaver Architect",
+    "occasion": "graduation",
+    "insideText": "All that hard work finally paid off. A dam good job! Congratulations!",
+    "video": "/videos/beaver-architect.mp4"
+  },
+  {
+    "id": "apologetic-standoff",
+    "name": "The Apologetic Standoff",
+    "occasion": "apology",
+    "insideText": "I insist, you first. No, after you! Sorry about the kerfuffle. Let's make up.",
+    "video": "/videos/apologetic-standoff.mp4"
+  },
+  {
+    "id": "zamboni-drive-thru",
+    "name": "Zamboni Drive-Thru",
+    "occasion": "just-because",
+    "insideText": "Whatever you're driving today, make sure you fuel up. Coffee's on me.",
+    "video": "/videos/zamboni-drive-thru.mp4"
+  },
+  {
+    "id": "mountie-moose",
+    "name": "Majestic Mountie Moose",
+    "occasion": "congratulations",
+    "insideText": "Riding high on your success! Massive congratulations on a truly majestic achievement.",
+    "video": "/videos/mountie-moose.mp4"
+  },
+  {
+    "id": "curling-walk",
+    "name": "Curling Stone Walk",
+    "occasion": "retirement",
+    "insideText": "Time to slow down and just glide. Have a wonderful, relaxing retirement.",
+    "video": "/videos/curling-walk.mp4"
+  },
+  {
+    "id": "skookum",
+    "name": "Skookum Thumbs-Up",
+    "occasion": "encouragement",
+    "insideText": "You've got this. It's gonna be a totally skookum day!",
+    "video": "/videos/skookum.mp4"
+  },
+  {
+    "id": "bunny-hug",
+    "name": "The Literal Bunny Hug",
+    "occasion": "warm-wishes",
+    "insideText": "Sending you a massive bunny hug to survive the cold. Stay warm out there!",
+    "video": "/videos/bunny-hug.mp4"
+  }
+]

@@ -1,116 +1,84 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import html2canvas from 'html2canvas';
 import CardPreview from './CardPreview';
 import StarringYou from './StarringYou';
+import Link from 'next/link';
 
-const RED = '#c0392b';
-const RED_DARK = '#8b1a1a';
-const CREAM = '#faf8f3';
-const FONT_UI = "var(--font-dm-sans), 'DM Sans', sans-serif";
-const FONT_HEADLINE = "var(--font-playfair), 'Playfair Display', serif";
-
-type CollectionKey = 'classic' | 'cpr' | 'botanicals' | 'cosy' | 'starring-you';
-
-interface Template {
+interface CardTemplate {
+  id: string;
   name: string;
-  emoji: string;
-  image?: string;
+  src: string;
+  occasion: string;
+  style: string;
+  video?: string;
 }
 
-const COLLECTIONS: Record<CollectionKey, { label: string; templates: Template[] }> = {
-  classic: {
-    label: 'Classic',
-    templates: [
-      { name: 'Canada Day', emoji: '🇨🇦' },
-      { name: 'Fall Colours', emoji: '🍁' },
-      { name: 'Hockey Night', emoji: '🏒' },
-      { name: 'Northern Lights', emoji: '🌌' },
-      { name: 'Canadian Winter', emoji: '❄️' },
-      { name: 'Cottage Country', emoji: '🌊' },
-    ],
-  },
-  cpr: {
-    label: 'CPR Posters',
-    templates: [
-      { name: 'Canmore', emoji: '🏔️', image: '/cpr-cards/canmore.jpg' },
-    ],
-  },
-  botanicals: {
-    label: 'Canadian Botanicals',
-    templates: [
-      { name: 'Trillium', emoji: '🌸', image: '/botanicals/trillium.jpg' },
-      { name: 'Prairie Crocus', emoji: '💜', image: '/botanicals/prairie-crocus.jpg' },
-      { name: 'Pacific Dogwood', emoji: '🌼', image: '/botanicals/pacific-dogwood.jpg' },
-      { name: 'Wild Rose', emoji: '🌹', image: '/botanicals/wild-rose.jpg' },
-      { name: 'Fireweed', emoji: '🌺', image: '/botanicals/fireweed.jpg' },
-      { name: 'Blue Flag Iris', emoji: '💙', image: '/botanicals/blue-flag-iris.jpg' },
-      { name: 'Purple Violet', emoji: '🟣', image: '/botanicals/purple-violet.jpg' },
-      { name: 'Mayflower', emoji: '🤍', image: '/botanicals/mayflower.jpg' },
-    ],
-  },
-  cosy: {
-    label: 'Cosy Canada',
-    templates: [
-      { name: 'Muskoka Chairs', emoji: '🪑', image: '/cosy-cards/muskoka-chairs.jpg' },
-      { name: 'Log Cabin Stove', emoji: '🔥', image: '/cosy-cards/log-cabin-stove.jpg' },
-      { name: 'Backyard Rink', emoji: '⛸️', image: '/cosy-cards/backyard-rink.jpg' },
-      { name: 'Porch Swing Autumn', emoji: '🍂', image: '/cosy-cards/porch-swing-autumn.jpg' },
-      { name: 'Kitchen Table Pie', emoji: '🥧', image: '/cosy-cards/kitchen-table-pie.jpg' },
-      { name: 'Cottage Dock Sunset', emoji: '🌅', image: '/cosy-cards/cottage-dock-sunset.jpg' },
-    ],
-  },
-  'starring-you': {
-    label: 'Starring You',
-    templates: [
-      { name: 'Starring You', emoji: '🎭' },
-    ],
-  },
-};
-
-const OCCASIONS = [
-  'Birthday', 'Canada Day', 'Thanksgiving', 'Just Because',
-  'Christmas', 'New Year', 'Graduation', 'Congratulations',
-  'New Baby', 'Sympathy', 'Thinking of You', "Mother's Day",
-  "Valentine's", 'Wedding', 'Remembrance Day', "Father's Day",
-  'Get Well', 'Thank You',
+const CARD_TEMPLATES: CardTemplate[] = [
+  // Birthday
+  { id: 'bday-cake', name: 'Cake Risograph', src: '/cards/birthday/cake-risograph.jpg', occasion: 'Birthday', style: 'risograph' },
+  { id: 'bday-bear', name: 'Bear Gouache', src: '/cards/birthday/bear-gouache.jpg', occasion: 'Birthday', style: 'gouache' },
+  { id: 'bday-moose', name: 'Moose Linocut', src: '/cards/birthday/moose-linocut.jpg', occasion: 'Birthday', style: 'linocut' },
+  { id: 'bday-balloons', name: 'Balloons', src: '/cards/birthday/balloons-midcentury.jpg', occasion: 'Birthday', style: 'midcentury' },
+  { id: 'bday-loon', name: 'Loon Screenprint', src: '/cards/birthday/loon-screenprint.jpg', occasion: 'Birthday', style: 'screenprint' },
+  { id: 'bday-party', name: 'Party Letterpress', src: '/cards/birthday/party-letterpress.jpg', occasion: 'Birthday', style: 'letterpress' },
+  // Christmas
+  { id: 'xmas-cabin', name: 'Cabin Gouache', src: '/cards/christmas/cabin-gouache.jpg', occasion: 'Christmas', style: 'gouache' },
+  { id: 'xmas-fireplace', name: 'Fireplace', src: '/cards/christmas/fireplace-midcentury.jpg', occasion: 'Christmas', style: 'midcentury' },
+  { id: 'xmas-hotchoc', name: 'Hot Chocolate', src: '/cards/christmas/hotchocolate-gouache.jpg', occasion: 'Christmas', style: 'gouache' },
+  { id: 'xmas-mittens', name: 'Mittens', src: '/cards/christmas/mittens-screenprint.jpg', occasion: 'Christmas', style: 'screenprint' },
+  { id: 'xmas-skating', name: 'Skating', src: '/cards/christmas/skating-risograph.jpg', occasion: 'Christmas', style: 'risograph' },
+  { id: 'xmas-tree', name: 'Tree Linocut', src: '/cards/christmas/tree-linocut.jpg', occasion: 'Christmas', style: 'linocut' },
+  // Thank You
+  { id: 'ty-bouquet', name: 'Bouquet Gouache', src: '/cards/thank-you/bouquet-gouache.jpg', occasion: 'Thank You', style: 'gouache' },
+  { id: 'ty-canoe', name: 'Canoe', src: '/cards/thank-you/canoe-screenprint.jpg', occasion: 'Thank You', style: 'screenprint' },
+  { id: 'ty-bird', name: 'Bird Linocut', src: '/cards/thank-you/bird-linocut.jpg', occasion: 'Thank You', style: 'linocut' },
+  { id: 'ty-garden', name: 'Garden', src: '/cards/thank-you/garden-letterpress.jpg', occasion: 'Thank You', style: 'letterpress' },
+  { id: 'ty-syrup', name: 'Syrup', src: '/cards/thank-you/syrup-risograph.jpg', occasion: 'Thank You', style: 'risograph' },
+  { id: 'ty-tea', name: 'Tea Midcentury', src: '/cards/thank-you/tea-midcentury.jpg', occasion: 'Thank You', style: 'midcentury' },
+  // Video cards
+  { id: 'vid-thonk', name: 'T-Honk You', src: '/videos/t-honk-thumb.jpg', occasion: 'Thank You', style: 'video', video: '/videos/t-honk.mp4' },
+  { id: 'vid-beaver', name: 'Beaver Architect', src: '/videos/beaver-architect-thumb.jpg', occasion: 'Graduation', style: 'video', video: '/videos/beaver-architect.mp4' },
+  { id: 'vid-curling', name: 'Curling Walk', src: '/videos/curling-walk-thumb.jpg', occasion: 'Retirement', style: 'video', video: '/videos/curling-walk.mp4' },
+  { id: 'vid-mountie', name: 'Mountie Moose', src: '/videos/mountie-moose-thumb.jpg', occasion: 'Congratulations', style: 'video', video: '/videos/mountie-moose.mp4' },
+  { id: 'vid-zamboni', name: 'Zamboni Drive-Thru', src: '/videos/zamboni-drive-thru-thumb.jpg', occasion: 'Just Because', style: 'video', video: '/videos/zamboni-drive-thru.mp4' },
+  { id: 'vid-skookum', name: 'Skookum', src: '/videos/skookum-thumb.jpg', occasion: 'Encouragement', style: 'video', video: '/videos/skookum.mp4' },
+  { id: 'vid-syrup', name: 'Maple Syrup IV', src: '/videos/syrup-iv-thumb.jpg', occasion: 'Get Well', style: 'video', video: '/videos/syrup-iv.mp4' },
+  { id: 'vid-standoff', name: 'Apologetic Standoff', src: '/videos/apologetic-standoff-thumb.jpg', occasion: 'Apology', style: 'video', video: '/videos/apologetic-standoff.mp4' },
+  { id: 'vid-bunny', name: 'Bunny Hug', src: '/videos/bunny-hug-thumb.jpg', occasion: 'Warm Wishes', style: 'video', video: '/videos/bunny-hug.mp4' },
 ];
 
-const OCCASION_COLLECTION: Record<string, CollectionKey> = {
-  'Canada Day': 'cpr',
-  'Remembrance Day': 'cpr',
-  "Mother's Day": 'botanicals',
-  "Valentine's": 'botanicals',
-  'Thank You': 'botanicals',
-  'Christmas': 'cosy',
-  'Thanksgiving': 'cosy',
-};
+const OCCASIONS = ['All', 'Birthday', 'Christmas', 'Thank You', 'Congratulations', 'Retirement', 'Get Well', 'Just Because', 'Encouragement', 'Graduation', 'Apology', 'Warm Wishes'];
 
 const PROVINCES = [
   'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick',
   'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia',
-  'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec',
-  'Saskatchewan', 'Yukon',
+  'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon',
 ];
 
-const STICKER_OPTIONS = ['🍁', '🐻', '🦫', '🦌', '🏒', '🌲'];
+type TabKey = 'designs' | 'starring-you';
+type Step = 'pick' | 'customize';
 
 export default function CardEditor() {
   const previewRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
-  const [activeCollection, setActiveCollection] = useState<CollectionKey>('classic');
-  const [showAnimation, setShowAnimation] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabKey>('designs');
+  const [step, setStep] = useState<Step>('pick');
+  const [selectedOccasion, setSelectedOccasion] = useState('All');
+  const [selectedTemplate, setSelectedTemplate] = useState<CardTemplate | null>(null);
+  const [isPremium] = useState(true);
 
   const [card, setCard] = useState({
-    template: 'Canada Day',
-    message: 'Happy Canadian holidays!',
-    fromName: 'Your Friend',
+    template: '',
+    message: '',
+    fromName: '',
     province: 'Ontario',
     bilingual: false,
-    stickers: '🍁',
-    image: undefined as string | undefined,
-    occasion: undefined as string | undefined,
+    stickers: '',
+    video: undefined as string | undefined,
+    faceSwapImage: undefined as string | undefined,
+    backgroundImage: undefined as string | undefined,
   });
 
   const [formData, setFormData] = useState({
@@ -118,7 +86,7 @@ export default function CardEditor() {
     recipientName: '',
   });
 
-  const handleCardChange = (field: string, value: unknown) => {
+  const handleCardChange = (field: string, value: any) => {
     setCard((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -126,40 +94,53 @@ export default function CardEditor() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const selectTemplate = (t: Template) => {
+  const selectTemplate = (t: CardTemplate) => {
+    setSelectedTemplate(t);
     setCard((prev) => ({
       ...prev,
       template: t.name,
-      image: t.image,
+      video: t.video,
+      backgroundImage: t.video ? undefined : t.src,
+      faceSwapImage: undefined,
     }));
-  };
-
-  const selectOccasion = (occasion: string) => {
-    handleCardChange('occasion', occasion);
-    if (OCCASION_COLLECTION[occasion]) {
-      const col = OCCASION_COLLECTION[occasion];
-      setActiveCollection(col);
-      const first = COLLECTIONS[col].templates[0];
-      if (first) selectTemplate(first);
+    if (!card.message) {
+      const defaults: Record<string, string> = {
+        'Birthday': 'Wishing you the happiest of birthdays, eh!',
+        'Christmas': 'Merry Christmas from the True North!',
+        'Thank You': 'Thanks a million — you really are a beauty!',
+        'Congratulations': 'Way to go! Massive congratulations!',
+        'Retirement': 'Time to kick back and enjoy the good life!',
+        'Get Well': 'Sending maple-syrup-strength healing vibes!',
+        'Just Because': 'No reason needed — just thinking of you!',
+        'Encouragement': 'You\'ve got this. Go get \'em!',
+        'Graduation': 'A dam good job! Congratulations, grad!',
+        'Apology': 'Sorry about the kerfuffle. Let\'s make up, eh?',
+        'Warm Wishes': 'Sending a massive bunny hug your way!',
+      };
+      handleCardChange('message', defaults[t.occasion] || 'Thinking of you!');
     }
+    setStep('customize');
   };
 
-  const toggleSticker = (sticker: string) => {
-    setCard((prev) => {
-      const stickers = prev.stickers.includes(sticker)
-        ? prev.stickers.replace(sticker, '')
-        : prev.stickers + sticker;
-      return { ...prev, stickers };
-    });
-  };
-
-  const handleStarringYouSelect = (imageDataUrl: string) => {
+  const handleVideoReady = useCallback((videoUrl: string, message: string, imageUrl?: string) => {
     setCard((prev) => ({
       ...prev,
       template: 'Starring You',
-      image: imageDataUrl,
+      message,
+      video: videoUrl,
+      faceSwapImage: imageUrl,
+      backgroundImage: undefined,
     }));
-  };
+    setStep('customize');
+  }, []);
+
+  const handleUpgradeClick = useCallback(() => {
+    alert('Premium plans coming soon! For now, all features are unlocked.');
+  }, []);
+
+  const filteredTemplates = CARD_TEMPLATES.filter(
+    (t) => selectedOccasion === 'All' || t.occasion === selectedOccasion
+  );
 
   const sendCard = async () => {
     if (!formData.recipientEmail.includes('@')) {
@@ -174,24 +155,14 @@ export default function CardEditor() {
     setLoading(true);
     try {
       if (!previewRef.current) throw new Error('Preview not found');
-
-      const canvas = await html2canvas(previewRef.current, {
-        backgroundColor: '#fff',
-        scale: 2,
-        useCORS: true,
-      });
+      const canvas = await html2canvas(previewRef.current, { backgroundColor: '#fff', scale: 2 });
       const imageData = canvas.toDataURL('image/png');
 
       const response = await fetch('/api/send-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          template: card.template,
-          message: card.message,
-          fromName: card.fromName,
-          province: card.province,
-          bilingual: card.bilingual,
-          stickers: card.stickers,
+          ...card,
           recipientEmail: formData.recipientEmail,
           recipientName: formData.recipientName,
           imageData,
@@ -210,280 +181,237 @@ export default function CardEditor() {
     }
   };
 
-  const currentTemplates = COLLECTIONS[activeCollection].templates;
-  const isStarringYou = activeCollection === 'starring-you';
-
   return (
-    <div style={{ display: 'flex', height: '100vh', backgroundColor: CREAM }}>
-      {/* Sidebar */}
-      <div
-        style={{
-          width: '360px',
-          backgroundColor: '#fff',
-          borderRight: `3px solid ${RED}`,
-          overflowY: 'auto',
-          padding: '24px',
-        }}
-      >
-        <h2 style={{ color: RED, margin: '0 0 20px 0', fontSize: '22px', fontFamily: FONT_HEADLINE }}>
-          Create Card 🍁
-        </h2>
-
-        {/* Occasion Selector */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={labelStyle}>Occasion</label>
-          <select
-            value={card.occasion || ''}
-            onChange={(e) => selectOccasion(e.target.value)}
-            style={inputStyle}
+    <div className="min-h-screen bg-cream" style={{ fontFamily: 'var(--font-dm-sans), DM Sans, sans-serif' }}>
+      {/* Top bar */}
+      <div className="bg-white border-b border-foreground/5 px-4 md:px-6 h-14 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 no-underline">
+          <span className="text-xl">🍁</span>
+          <span className="text-lg font-bold" style={{ fontFamily: 'var(--font-playfair), Playfair Display, serif', color: 'var(--red)' }}>
+            MapleCard
+          </span>
+        </Link>
+        {step === 'customize' && (
+          <button
+            onClick={() => { setStep('pick'); setSelectedTemplate(null); }}
+            className="text-sm text-foreground/50 hover:text-foreground transition-colors cursor-pointer bg-transparent border-none"
           >
-            <option value="">Choose an occasion...</option>
-            {OCCASIONS.map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
-        </div>
+            &larr; Back to designs
+          </button>
+        )}
+      </div>
 
-        {/* Collection Tabs */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={labelStyle}>Collection</label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-            {(Object.keys(COLLECTIONS) as CollectionKey[]).map((key) => (
+      {/* Step 1: Pick a design */}
+      {step === 'pick' && (
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
+          {/* Tabs */}
+          <div className="flex gap-2 mb-8">
+            {([
+              { key: 'designs' as TabKey, label: 'Card Designs' },
+              { key: 'starring-you' as TabKey, label: 'Starring You' },
+            ]).map((tab) => (
               <button
-                key={key}
-                onClick={() => setActiveCollection(key)}
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className="px-5 py-2.5 rounded-full text-sm font-bold transition-all cursor-pointer"
                 style={{
-                  padding: '6px 12px',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  fontFamily: FONT_UI,
-                  border: activeCollection === key ? `2px solid ${RED}` : '2px solid #ddd',
-                  backgroundColor: activeCollection === key ? RED : '#fff',
-                  color: activeCollection === key ? '#fff' : '#333',
-                  borderRadius: '0',
-                  cursor: 'pointer',
-                  letterSpacing: '0.3px',
+                  backgroundColor: activeTab === tab.key ? 'var(--red)' : 'white',
+                  color: activeTab === tab.key ? 'white' : 'var(--foreground)',
+                  border: activeTab === tab.key ? '2px solid var(--red)' : '2px solid rgba(0,0,0,0.08)',
                 }}
               >
-                {COLLECTIONS[key].label}
+                {tab.label}
               </button>
             ))}
           </div>
-        </div>
 
-        {/* Template Picker or Starring You */}
-        {isStarringYou ? (
-          <StarringYou onSelect={handleStarringYouSelect} recipientName={formData.recipientName} />
-        ) : (
-          <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Template</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              {currentTemplates.map((t) => (
-                <button
-                  key={t.name}
-                  onClick={() => selectTemplate(t)}
-                  style={{
-                    padding: '10px',
-                    border: card.template === t.name ? `3px solid ${RED}` : '2px solid #ddd',
-                    backgroundColor: card.template === t.name ? '#fff' : CREAM,
-                    borderRadius: '0',
-                    cursor: 'pointer',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    fontFamily: FONT_UI,
-                    textAlign: 'center',
-                    boxShadow: card.template === t.name ? `4px 4px 0 ${RED_DARK}` : 'none',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  <div style={{ fontSize: '20px', marginBottom: '2px' }}>{t.emoji}</div>
-                  <div>{t.name}</div>
-                </button>
-              ))}
+          {activeTab === 'designs' && (
+            <>
+              <h1 className="text-2xl md:text-3xl font-black mb-2" style={{ fontFamily: 'var(--font-playfair), Playfair Display, serif' }}>
+                Choose a design
+              </h1>
+              <p className="text-foreground/50 mb-6 text-sm">Pick a card, then customize it with your message.</p>
+
+              {/* Occasion filter */}
+              <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4">
+                {OCCASIONS.map((o) => (
+                  <button
+                    key={o}
+                    onClick={() => setSelectedOccasion(o)}
+                    className="px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer"
+                    style={{
+                      backgroundColor: selectedOccasion === o ? 'var(--foreground)' : 'white',
+                      color: selectedOccasion === o ? 'white' : 'var(--foreground)',
+                      border: '1.5px solid',
+                      borderColor: selectedOccasion === o ? 'var(--foreground)' : 'rgba(0,0,0,0.08)',
+                    }}
+                  >
+                    {o}
+                  </button>
+                ))}
+              </div>
+
+              {/* Template grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {filteredTemplates.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => selectTemplate(t)}
+                    className="text-left group bg-transparent border-none p-0 cursor-pointer"
+                  >
+                    <div
+                      className="rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative"
+                      style={{ aspectRatio: '3/4' }}
+                    >
+                      <img src={t.src} alt={t.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      {t.video && (
+                        <div className="absolute top-2 right-2 bg-white/90 rounded-full w-6 h-6 flex items-center justify-center">
+                          <span className="text-[10px]">▶</span>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-foreground/50 mt-2 font-medium truncate">{t.name}</p>
+                    <p className="text-[10px] font-bold uppercase" style={{ color: 'var(--red)' }}>{t.occasion}</p>
+                  </button>
+                ))}
+              </div>
+
+              {filteredTemplates.length === 0 && (
+                <div className="text-center py-20 text-foreground/30">
+                  <p className="text-4xl mb-4">🍁</p>
+                  <p className="font-medium">No cards for this occasion yet — more coming soon!</p>
+                </div>
+              )}
+            </>
+          )}
+
+          {activeTab === 'starring-you' && (
+            <div className="max-w-lg">
+              <h1 className="text-2xl md:text-3xl font-black mb-2" style={{ fontFamily: 'var(--font-playfair), Playfair Display, serif' }}>
+                Star in your card
+              </h1>
+              <p className="text-foreground/50 mb-6 text-sm">Pick a scene, upload your photo, and our AI puts you in the card.</p>
+              <StarringYou
+                isPremium={isPremium}
+                onUpgradeClick={handleUpgradeClick}
+                onVideoReady={handleVideoReady}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Step 2: Customize */}
+      {step === 'customize' && (
+        <div className="flex flex-col lg:flex-row min-h-[calc(100vh-56px)]">
+          {/* Sidebar form */}
+          <div className="w-full lg:w-[380px] bg-white border-r border-foreground/5 overflow-y-auto p-6 shrink-0">
+            <h2 className="text-lg font-black mb-6" style={{ fontFamily: 'var(--font-playfair), Playfair Display, serif' }}>
+              Customize your card
+            </h2>
+
+            {/* Message */}
+            <div className="mb-5">
+              <label className="block mb-1.5 text-xs font-bold text-foreground/70 uppercase tracking-wider">Message</label>
+              <textarea
+                value={card.message}
+                onChange={(e) => handleCardChange('message', e.target.value)}
+                className="w-full min-h-[100px] p-3 border-2 border-foreground/10 rounded-xl text-sm focus:border-maple focus:outline-none transition-colors resize-none"
+                style={{ fontFamily: 'var(--font-lora), Lora, serif', boxSizing: 'border-box' }}
+                placeholder="Your message here..."
+              />
+            </div>
+
+            {/* From Name */}
+            <div className="mb-5">
+              <label className="block mb-1.5 text-xs font-bold text-foreground/70 uppercase tracking-wider">From</label>
+              <input
+                type="text"
+                value={card.fromName}
+                onChange={(e) => handleCardChange('fromName', e.target.value)}
+                className="w-full p-3 border-2 border-foreground/10 rounded-xl text-sm focus:border-maple focus:outline-none transition-colors"
+                style={{ boxSizing: 'border-box' }}
+                placeholder="Your name"
+              />
+            </div>
+
+            {/* Province */}
+            <div className="mb-5">
+              <label className="block mb-1.5 text-xs font-bold text-foreground/70 uppercase tracking-wider">Province</label>
+              <select
+                value={card.province}
+                onChange={(e) => handleCardChange('province', e.target.value)}
+                className="w-full p-3 border-2 border-foreground/10 rounded-xl text-sm focus:border-maple focus:outline-none transition-colors bg-white"
+                style={{ boxSizing: 'border-box' }}
+              >
+                {PROVINCES.map((p) => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Bilingual */}
+            <div className="mb-6 flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="bilingual"
+                checked={card.bilingual}
+                onChange={(e) => handleCardChange('bilingual', e.target.checked)}
+                className="w-5 h-5 cursor-pointer"
+                style={{ accentColor: 'var(--red)' }}
+              />
+              <label htmlFor="bilingual" className="text-sm font-medium cursor-pointer">
+                Bilingual (French/English)
+              </label>
+            </div>
+
+            <hr className="border-foreground/5 my-6" />
+
+            {/* Recipient */}
+            <h3 className="text-sm font-bold mb-4 text-foreground/70">Send to</h3>
+
+            <div className="mb-4">
+              <label className="block mb-1.5 text-xs font-bold text-foreground/70 uppercase tracking-wider">Email</label>
+              <input
+                type="email"
+                value={formData.recipientEmail}
+                onChange={(e) => handleFormChange('recipientEmail', e.target.value)}
+                className="w-full p-3 border-2 border-foreground/10 rounded-xl text-sm focus:border-maple focus:outline-none transition-colors"
+                style={{ boxSizing: 'border-box' }}
+                placeholder="friend@example.com"
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block mb-1.5 text-xs font-bold text-foreground/70 uppercase tracking-wider">Name (optional)</label>
+              <input
+                type="text"
+                value={formData.recipientName}
+                onChange={(e) => handleFormChange('recipientName', e.target.value)}
+                className="w-full p-3 border-2 border-foreground/10 rounded-xl text-sm focus:border-maple focus:outline-none transition-colors"
+                style={{ boxSizing: 'border-box' }}
+                placeholder="Their name"
+              />
+            </div>
+
+            <button
+              onClick={sendCard}
+              disabled={loading}
+              className="w-full py-3.5 rounded-xl text-white font-bold text-sm transition-all cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: 'var(--red)' }}
+            >
+              {loading ? 'Sending...' : 'Send Card'}
+            </button>
+          </div>
+
+          {/* Preview area */}
+          <div className="flex-1 flex items-center justify-center p-6 md:p-12" style={{ backgroundColor: 'var(--cream-dark, #f0ebe3)' }}>
+            <div style={{ filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.15))' }}>
+              <CardPreview ref={previewRef} card={card} />
             </div>
           </div>
-        )}
-
-        {/* Animation Toggle */}
-        <div style={{ marginBottom: '16px' }}>
-          <button
-            onClick={() => setShowAnimation(!showAnimation)}
-            style={{
-              width: '100%',
-              padding: '8px',
-              fontSize: '12px',
-              fontWeight: 700,
-              fontFamily: FONT_UI,
-              border: `2px solid ${showAnimation ? RED : '#ddd'}`,
-              backgroundColor: showAnimation ? RED : '#fff',
-              color: showAnimation ? '#fff' : '#666',
-              borderRadius: '0',
-              cursor: 'pointer',
-              boxShadow: showAnimation ? `3px 3px 0 ${RED_DARK}` : 'none',
-            }}
-          >
-            {showAnimation ? '✨ Animations ON' : '✨ Animations OFF'}
-          </button>
         </div>
-
-        {/* Message */}
-        <div style={{ marginBottom: '14px' }}>
-          <label style={labelStyle}>Message</label>
-          <textarea
-            value={card.message}
-            onChange={(e) => handleCardChange('message', e.target.value)}
-            style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }}
-            placeholder="Your message here..."
-          />
-        </div>
-
-        {/* From Name */}
-        <div style={{ marginBottom: '14px' }}>
-          <label style={labelStyle}>From Name</label>
-          <input
-            type="text"
-            value={card.fromName}
-            onChange={(e) => handleCardChange('fromName', e.target.value)}
-            style={inputStyle}
-          />
-        </div>
-
-        {/* Province */}
-        <div style={{ marginBottom: '14px' }}>
-          <label style={labelStyle}>Province</label>
-          <select
-            value={card.province}
-            onChange={(e) => handleCardChange('province', e.target.value)}
-            style={inputStyle}
-          >
-            {PROVINCES.map((p) => (
-              <option key={p} value={p}>{p}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Stickers */}
-        <div style={{ marginBottom: '14px' }}>
-          <label style={labelStyle}>Stickers</label>
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {STICKER_OPTIONS.map((s) => (
-              <button
-                key={s}
-                onClick={() => toggleSticker(s)}
-                style={{
-                  width: '38px',
-                  height: '38px',
-                  fontSize: '18px',
-                  border: card.stickers.includes(s) ? `2px solid ${RED}` : '2px solid #ddd',
-                  backgroundColor: card.stickers.includes(s) ? '#fff' : CREAM,
-                  borderRadius: '0',
-                  cursor: 'pointer',
-                  boxShadow: card.stickers.includes(s) ? `2px 2px 0 ${RED_DARK}` : 'none',
-                }}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Bilingual Toggle */}
-        <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <input
-            type="checkbox"
-            id="bilingual"
-            checked={card.bilingual}
-            onChange={(e) => handleCardChange('bilingual', e.target.checked)}
-            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-          />
-          <label htmlFor="bilingual" style={{ fontWeight: 700, color: '#333', cursor: 'pointer', margin: 0, fontSize: '13px', fontFamily: FONT_UI }}>
-            Bilingual (French/English) 🇨🇦
-          </label>
-        </div>
-
-        {/* Recipient Email */}
-        <div style={{ marginBottom: '14px' }}>
-          <label style={labelStyle}>Recipient Email</label>
-          <input
-            type="email"
-            value={formData.recipientEmail}
-            onChange={(e) => handleFormChange('recipientEmail', e.target.value)}
-            style={inputStyle}
-            placeholder="recipient@example.com"
-          />
-        </div>
-
-        {/* Recipient Name */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={labelStyle}>Recipient Name (optional)</label>
-          <input
-            type="text"
-            value={formData.recipientName}
-            onChange={(e) => handleFormChange('recipientName', e.target.value)}
-            style={inputStyle}
-            placeholder="John Doe"
-          />
-        </div>
-
-        {/* Send Button */}
-        <button
-          onClick={sendCard}
-          disabled={loading}
-          style={{
-            width: '100%',
-            padding: '14px',
-            backgroundColor: RED,
-            color: '#fff',
-            border: 'none',
-            borderRadius: '0',
-            fontSize: '15px',
-            fontWeight: 700,
-            fontFamily: FONT_UI,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.7 : 1,
-            boxShadow: `6px 6px 0 ${RED_DARK}`,
-          }}
-        >
-          {loading ? 'Sending...' : 'Send Card'}
-        </button>
-      </div>
-
-      {/* Preview Area */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '40px',
-          backgroundColor: CREAM,
-        }}
-      >
-        <div style={{ filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.15))' }}>
-          <CardPreview ref={previewRef} card={card} showAnimation={showAnimation} />
-        </div>
-      </div>
+      )}
     </div>
   );
 }
-
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  marginBottom: '6px',
-  fontWeight: 700,
-  color: '#333',
-  fontSize: '13px',
-  letterSpacing: '0.5px',
-  textTransform: 'uppercase',
-  fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
-};
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '10px',
-  border: '2px solid #ddd',
-  borderRadius: '0',
-  boxSizing: 'border-box',
-  fontSize: '14px',
-  fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
-};

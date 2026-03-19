@@ -1,0 +1,92 @@
+[
+  {
+    "id": "t-honk",
+    "name": "T-Honk You Goose",
+    "caption": "T-HONK YOU!",
+    "occasion": "Thank You",
+    "insideText": "I can't say it loud enough... T-HONK YOU!",
+    "thumbnail": "/videos/t-honk-thumb.jpg",
+    "template": "/videos/t-honk.mp4",
+    "duration": 8
+  },
+  {
+    "id": "syrup-iv",
+    "name": "Maple Syrup IV",
+    "caption": "GET WELL SOON",
+    "occasion": "Get Well",
+    "insideText": "Pumping you full of the good stuff. Get well soon, eh?",
+    "thumbnail": "/videos/syrup-iv-thumb.jpg",
+    "template": "/videos/syrup-iv.mp4",
+    "duration": 8
+  },
+  {
+    "id": "beaver-architect",
+    "name": "The Beaver Architect",
+    "caption": "A DAM GOOD JOB",
+    "occasion": "Graduation",
+    "insideText": "All that hard work finally paid off. A dam good job! Congratulations!",
+    "thumbnail": "/videos/beaver-architect-thumb.jpg",
+    "template": "/videos/beaver-architect.mp4",
+    "duration": 8
+  },
+  {
+    "id": "apologetic-standoff",
+    "name": "Apologetic Standoff",
+    "caption": "SORRY EH",
+    "occasion": "Apology",
+    "insideText": "I insist, you first. No, after you! Sorry about the kerfuffle. Let's make up.",
+    "thumbnail": "/videos/apologetic-standoff-thumb.jpg",
+    "template": "/videos/apologetic-standoff.mp4",
+    "duration": 8
+  },
+  {
+    "id": "zamboni-drive-thru",
+    "name": "Zamboni Drive-Thru",
+    "caption": "COFFEE'S ON ME",
+    "occasion": "Just Because",
+    "insideText": "Whatever you're driving today, make sure you fuel up. Coffee's on me.",
+    "thumbnail": "/videos/zamboni-drive-thru-thumb.jpg",
+    "template": "/videos/zamboni-drive-thru.mp4",
+    "duration": 8
+  },
+  {
+    "id": "mountie-moose",
+    "name": "Majestic Mountie Moose",
+    "caption": "RIDING HIGH",
+    "occasion": "Congratulations",
+    "insideText": "Riding high on your success! Massive congratulations on a truly majestic achievement.",
+    "thumbnail": "/videos/mountie-moose-thumb.jpg",
+    "template": "/videos/mountie-moose.mp4",
+    "duration": 8
+  },
+  {
+    "id": "curling-walk",
+    "name": "Curling Stone Walk",
+    "caption": "GLIDE INTO RETIREMENT",
+    "occasion": "Retirement",
+    "insideText": "Time to slow down and just glide. Have a wonderful, relaxing retirement.",
+    "thumbnail": "/videos/curling-walk-thumb.jpg",
+    "template": "/videos/curling-walk.mp4",
+    "duration": 8
+  },
+  {
+    "id": "skookum",
+    "name": "Skookum Thumbs-Up",
+    "caption": "YOU'VE GOT THIS",
+    "occasion": "Encouragement",
+    "insideText": "You've got this. It's gonna be a totally skookum day!",
+    "thumbnail": "/videos/skookum-thumb.jpg",
+    "template": "/videos/skookum.mp4",
+    "duration": 8
+  },
+  {
+    "id": "bunny-hug",
+    "name": "The Literal Bunny Hug",
+    "caption": "STAY WARM",
+    "occasion": "Warm Wishes",
+    "insideText": "Sending you a massive bunny hug to survive the cold. Stay warm out there!",
+    "thumbnail": "/videos/bunny-hug-thumb.jpg",
+    "template": "/videos/bunny-hug.mp4",
+    "duration": 8
+  }
+]
