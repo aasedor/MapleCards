@@ -13,6 +13,7 @@ interface SendCardRequest {
   recipientEmail: string;
   recipientName: string;
   imageData: string; // base64 PNG
+  scheduledAt?: string; // ISO date string for scheduled send
 }
 
 export async function POST(request: NextRequest) {
@@ -41,19 +42,29 @@ export async function POST(request: NextRequest) {
       recipientName: body.recipientName,
     });
 
-    // Send via Resend
-    const result = await getResend().emails.send({
+    // Send via Resend (supports scheduled send)
+    const sendPayload: any = {
       from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
       to: body.recipientEmail,
       subject: `🍁 A MapleCard from ${body.fromName}!`,
       react: emailComponent,
-    });
+    };
+
+    if (body.scheduledAt) {
+      sendPayload.scheduledAt = body.scheduledAt;
+    }
+
+    const result = await getResend().emails.send(sendPayload);
 
     if (result.error) {
       return NextResponse.json({ error: result.error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, id: result.data?.id });
+    return NextResponse.json({
+      success: true,
+      id: result.data?.id,
+      scheduled: !!body.scheduledAt,
+    });
   } catch (error) {
     console.error('Error sending card:', error);
     return NextResponse.json(

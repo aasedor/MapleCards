@@ -2,6 +2,12 @@
 
 import React, { forwardRef } from 'react';
 
+const FONT_MAP: Record<string, string> = {
+  'lora': 'var(--font-lora), Lora, serif',
+  'playfair': 'var(--font-playfair), Playfair Display, serif',
+  'dm-sans': 'var(--font-dm-sans), DM Sans, sans-serif',
+};
+
 interface CardPreviewProps {
   card: {
     template: string;
@@ -13,6 +19,9 @@ interface CardPreviewProps {
     video?: string;
     faceSwapImage?: string;
     backgroundImage?: string;
+    font?: string;
+    textColor?: string;
+    messagePosition?: 'top' | 'center' | 'bottom';
   };
 }
 
@@ -20,6 +29,10 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(({ card }, ref)
   const hasVideo = !!card.video;
   const hasBackground = !!card.backgroundImage;
   const hasMedia = hasVideo || hasBackground || !!card.faceSwapImage;
+  const messageFont = FONT_MAP[card.font || 'lora'] || FONT_MAP['lora'];
+  const textColor = card.textColor || (hasMedia ? '#fff' : '#1a1a1a');
+  const msgPos = card.messagePosition || 'bottom';
+  const justifyContent = msgPos === 'top' ? 'flex-start' : msgPos === 'center' ? 'center' : 'flex-end';
 
   return (
     <div
@@ -85,7 +98,11 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(({ card }, ref)
           style={{
             position: 'absolute',
             top: 0, left: 0, right: 0, bottom: 0,
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.7) 100%)',
+            background: msgPos === 'top'
+              ? 'linear-gradient(to top, rgba(0,0,0,0) 30%, rgba(0,0,0,0.7) 100%)'
+              : msgPos === 'center'
+              ? 'radial-gradient(ellipse at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 100%)'
+              : 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.7) 100%)',
             pointerEvents: 'none',
           }}
         />
@@ -103,6 +120,49 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(({ card }, ref)
         />
       )}
 
+      {/* Sticker overlays */}
+      {card.stickers && card.stickers.split(',').filter(Boolean).map((stickerId, idx) => {
+        const STICKER_MAP: Record<string, string> = {
+          maple: '🍁', heart: '❤️', star: '⭐', sparkle: '✨', gift: '🎁',
+          balloon: '🎈', cake: '🎂', confetti: '🎊', flower: '🌸',
+          snowflake: '❄️', moose: '🫎', beaver: '🦫',
+        };
+        const emoji = STICKER_MAP[stickerId] || '🍁';
+        // Deterministic positions based on sticker index
+        const positions = [
+          { top: '8%', right: '8%', rotate: 15, size: 32 },
+          { top: '12%', right: '22%', rotate: -10, size: 26 },
+          { top: '6%', left: '8%', rotate: -20, size: 28 },
+          { top: '18%', left: '18%', rotate: 8, size: 24 },
+          { top: '5%', right: '40%', rotate: 25, size: 22 },
+          { top: '22%', right: '10%', rotate: -5, size: 30 },
+          { top: '15%', left: '35%', rotate: 12, size: 20 },
+          { top: '3%', left: '48%', rotate: -15, size: 26 },
+          { top: '25%', left: '5%', rotate: 18, size: 24 },
+          { top: '10%', right: '55%', rotate: -22, size: 22 },
+          { top: '20%', right: '35%', rotate: 7, size: 28 },
+          { top: '28%', left: '28%', rotate: -12, size: 20 },
+        ];
+        const pos = positions[idx % positions.length];
+        const { rotate: r, size: s, ...cssPos } = pos;
+        return (
+          <span
+            key={`${stickerId}-${idx}`}
+            style={{
+              position: 'absolute',
+              zIndex: 2,
+              fontSize: `${s}px`,
+              transform: `rotate(${r}deg)`,
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+              pointerEvents: 'none',
+              ...cssPos,
+            }}
+          >
+            {emoji}
+          </span>
+        );
+      })}
+
       {/* Content overlay */}
       <div style={{
         position: 'relative',
@@ -110,8 +170,9 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(({ card }, ref)
         padding: '24px',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-end',
+        justifyContent,
         flex: 1,
+        paddingTop: msgPos === 'top' ? '48px' : '24px',
       }}>
         {/* Top: Template name pill */}
         <div style={{ position: 'absolute', top: '20px', left: '24px', right: '24px' }}>
@@ -140,11 +201,11 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(({ card }, ref)
           <p
             style={{
               fontSize: '17px',
-              color: hasMedia ? '#fff' : '#1a1a1a',
+              color: textColor,
               margin: '0 0 16px 0',
               fontStyle: 'italic',
               lineHeight: '1.6',
-              fontFamily: 'var(--font-lora), Lora, serif',
+              fontFamily: messageFont,
               textShadow: hasMedia ? '0 1px 8px rgba(0,0,0,0.4)' : 'none',
             }}
           >
@@ -185,7 +246,7 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(({ card }, ref)
             {card.fromName && (
               <p style={{
                 fontSize: '14px',
-                color: hasMedia ? '#fff' : '#1a1a1a',
+                color: textColor,
                 margin: 0,
                 fontWeight: 'bold',
               }}>

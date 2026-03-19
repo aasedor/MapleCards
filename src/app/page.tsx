@@ -28,6 +28,102 @@ const OCCASION_CARDS = [
     { src: '/cards/thank-you/syrup-risograph.jpg', name: 'Syrup' },
     { src: '/cards/thank-you/tea-midcentury.jpg', name: 'Tea Midcentury' },
   ]},
+  { occasion: "Mother's Day", cards: [
+    { src: '/cards/mothers-day/tulips-gouache.jpg', name: 'Tulips' },
+    { src: '/cards/mothers-day/bear-cubs-risograph.jpg', name: 'Bear Cubs' },
+    { src: '/cards/mothers-day/garden-linocut.jpg', name: 'Garden' },
+    { src: '/cards/mothers-day/tea-time-screenprint.jpg', name: 'Tea Time' },
+    { src: '/cards/mothers-day/canoe-midcentury.jpg', name: 'Canoe Sunrise' },
+    { src: '/cards/mothers-day/cardinal-letterpress.jpg', name: 'Cardinal' },
+  ]},
+  { occasion: "Father's Day", cards: [
+    { src: '/cards/fathers-day/fishing-gouache.jpg', name: 'Fishing' },
+    { src: '/cards/fathers-day/campfire-risograph.jpg', name: 'Campfire' },
+    { src: '/cards/fathers-day/workshop-linocut.jpg', name: 'Workshop' },
+    { src: '/cards/fathers-day/hockey-screenprint.jpg', name: 'Hockey' },
+    { src: '/cards/fathers-day/bbq-midcentury.jpg', name: 'BBQ' },
+    { src: '/cards/fathers-day/canoe-paddle-letterpress.jpg', name: 'Canoe Paddle' },
+  ]},
+  { occasion: "Valentine's", cards: [
+    { src: '/cards/valentines/lovebirds-gouache.jpg', name: 'Lovebirds' },
+    { src: '/cards/valentines/northern-lights-risograph.jpg', name: 'Northern Lights' },
+    { src: '/cards/valentines/hot-cocoa-linocut.jpg', name: 'Hot Cocoa' },
+    { src: '/cards/valentines/maple-heart-screenprint.jpg', name: 'Maple Heart' },
+    { src: '/cards/valentines/skating-midcentury.jpg', name: 'Skating' },
+    { src: '/cards/valentines/cabin-letterpress.jpg', name: 'Cabin' },
+  ]},
+  { occasion: 'Wedding', cards: [
+    { src: '/cards/wedding/venue-gouache.jpg', name: 'Lakeside' },
+    { src: '/cards/wedding/rings-risograph.jpg', name: 'Rings' },
+    { src: '/cards/wedding/bouquet-linocut.jpg', name: 'Bouquet' },
+    { src: '/cards/wedding/toast-screenprint.jpg', name: 'Toast' },
+    { src: '/cards/wedding/barn-midcentury.jpg', name: 'Barn' },
+    { src: '/cards/wedding/swans-letterpress.jpg', name: 'Swans' },
+  ]},
+  { occasion: 'New Baby', cards: [
+    { src: '/cards/new-baby/stork-moose-gouache.jpg', name: 'Stork Moose' },
+    { src: '/cards/new-baby/nursery-risograph.jpg', name: 'Nursery' },
+    { src: '/cards/new-baby/duckling-linocut.jpg', name: 'Ducklings' },
+    { src: '/cards/new-baby/knitted-screenprint.jpg', name: 'Knitted' },
+    { src: '/cards/new-baby/forest-friends-midcentury.jpg', name: 'Forest Friends' },
+    { src: '/cards/new-baby/rainbow-letterpress.jpg', name: 'Rainbow' },
+  ]},
+  { occasion: 'Graduation', cards: [
+    { src: '/cards/graduation/cap-toss-gouache.jpg', name: 'Cap Toss' },
+    { src: '/cards/graduation/owl-risograph.jpg', name: 'Wise Owl' },
+    { src: '/cards/graduation/mountains-linocut.jpg', name: 'Summit' },
+    { src: '/cards/graduation/library-screenprint.jpg', name: 'Library' },
+    { src: '/cards/graduation/compass-midcentury.jpg', name: 'Compass' },
+    { src: '/cards/graduation/canoe-journey-letterpress.jpg', name: 'New Journey' },
+  ]},
+  { occasion: 'Sympathy', cards: [
+    { src: '/cards/sympathy/peaceful-lake-gouache.jpg', name: 'Peaceful Lake' },
+    { src: '/cards/sympathy/wildflowers-risograph.jpg', name: 'Wildflowers' },
+    { src: '/cards/sympathy/birch-grove-linocut.jpg', name: 'Birch Grove' },
+    { src: '/cards/sympathy/starlight-screenprint.jpg', name: 'Starlight' },
+    { src: '/cards/sympathy/garden-bench-midcentury.jpg', name: 'Garden Bench' },
+    { src: '/cards/sympathy/mountain-mist-letterpress.jpg', name: 'Mountain Mist' },
+  ]},
+  { occasion: 'Anniversary', cards: [
+    { src: '/cards/anniversary/sunset-canoe-gouache.jpg', name: 'Sunset Canoe' },
+    { src: '/cards/anniversary/dancing-risograph.jpg', name: 'Dancing' },
+    { src: '/cards/anniversary/wine-toast-linocut.jpg', name: 'Wine Toast' },
+    { src: '/cards/anniversary/love-lock-screenprint.jpg', name: 'Love Lock' },
+    { src: '/cards/anniversary/cabin-fire-midcentury.jpg', name: 'Cabin Fire' },
+    { src: '/cards/anniversary/geese-letterpress.jpg', name: 'Canada Geese' },
+  ]},
+  { occasion: 'Congratulations', cards: [
+    { src: '/cards/congratulations/fireworks-gouache.jpg', name: 'Fireworks' },
+    { src: '/cards/congratulations/trophy-risograph.jpg', name: 'Trophy' },
+    { src: '/cards/congratulations/champagne-linocut.jpg', name: 'Champagne' },
+    { src: '/cards/congratulations/summit-screenprint.jpg', name: 'Summit' },
+    { src: '/cards/congratulations/ribbon-midcentury.jpg', name: 'Ribbon Cutting' },
+    { src: '/cards/congratulations/northern-lights-letterpress.jpg', name: 'Aurora' },
+  ]},
+  { occasion: 'Get Well', cards: [
+    { src: '/cards/get-well/soup-gouache.jpg', name: 'Soup' },
+    { src: '/cards/get-well/sunshine-risograph.jpg', name: 'Sunshine' },
+    { src: '/cards/get-well/healing-garden-linocut.jpg', name: 'Healing Garden' },
+    { src: '/cards/get-well/teddy-screenprint.jpg', name: 'Teddy Bear' },
+    { src: '/cards/get-well/rainbow-midcentury.jpg', name: 'Rainbow' },
+    { src: '/cards/get-well/tea-honey-letterpress.jpg', name: 'Tea & Honey' },
+  ]},
+  { occasion: 'Retirement', cards: [
+    { src: '/cards/retirement/hammock-gouache.jpg', name: 'Hammock' },
+    { src: '/cards/retirement/fishing-boat-risograph.jpg', name: 'Fishing' },
+    { src: '/cards/retirement/garden-linocut.jpg', name: 'Garden' },
+    { src: '/cards/retirement/road-trip-screenprint.jpg', name: 'Road Trip' },
+    { src: '/cards/retirement/golf-midcentury.jpg', name: 'Golf' },
+    { src: '/cards/retirement/rocking-chair-letterpress.jpg', name: 'Cabin Porch' },
+  ]},
+  { occasion: 'Just Because', cards: [
+    { src: '/cards/thinking-of-you/letter-gouache.jpg', name: 'Letter' },
+    { src: '/cards/thinking-of-you/window-risograph.jpg', name: 'Window Seat' },
+    { src: '/cards/thinking-of-you/moonlight-linocut.jpg', name: 'Moonlight' },
+    { src: '/cards/thinking-of-you/wildflower-screenprint.jpg', name: 'Wildflower' },
+    { src: '/cards/thinking-of-you/bridge-midcentury.jpg', name: 'Covered Bridge' },
+    { src: '/cards/thinking-of-you/songbird-letterpress.jpg', name: 'Songbird' },
+  ]},
 ];
 
 const VIDEO_CARDS = [
@@ -173,11 +269,11 @@ export default function Home() {
           {/* Hero card showcase — 5 tilted cards */}
           <div className="flex justify-center items-end gap-3 md:gap-5 max-w-3xl mx-auto">
             {[
-              { src: '/cards/birthday/cake-risograph.jpg', rotate: -8, y: 20 },
-              { src: '/cards/christmas/cabin-gouache.jpg', rotate: -3, y: 5 },
-              { src: '/cards/thank-you/bouquet-gouache.jpg', rotate: 0, y: 0 },
-              { src: '/cards/birthday/moose-linocut.jpg', rotate: 4, y: 8 },
-              { src: '/cards/christmas/mittens-screenprint.jpg', rotate: 9, y: 24 },
+              { src: '/cards/valentines/lovebirds-gouache.jpg', rotate: -8, y: 20 },
+              { src: '/cards/mothers-day/tulips-gouache.jpg', rotate: -3, y: 5 },
+              { src: '/cards/birthday/cake-risograph.jpg', rotate: 0, y: 0 },
+              { src: '/cards/christmas/cabin-gouache.jpg', rotate: 4, y: 8 },
+              { src: '/cards/sympathy/peaceful-lake-gouache.jpg', rotate: 9, y: 24 },
             ].map((card, i) => (
               <div
                 key={i}
@@ -276,6 +372,39 @@ export default function Home() {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section className="py-20 px-6 bg-cream">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-black mb-4" style={{ fontFamily: 'var(--font-playfair), Playfair Display, serif' }}>
+              How it works
+            </h2>
+            <p className="text-foreground/60 max-w-xl mx-auto">
+              Create and send a beautiful card in under a minute.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {[
+              { step: '1', icon: '🎨', title: 'Pick a design', desc: 'Browse 90+ handcrafted designs or upload your own photo' },
+              { step: '2', icon: '✍️', title: 'Add your message', desc: 'Write from the heart or let AI suggest the perfect words' },
+              { step: '3', icon: '🎨', title: 'Customize', desc: 'Choose fonts, colors, stickers, and text placement' },
+              { step: '4', icon: '📧', title: 'Send instantly', desc: 'Email it now, schedule for later, or share a link' },
+            ].map((s, i) => (
+              <div key={i} className="text-center relative">
+                {i < 3 && (
+                  <div className="hidden md:block absolute top-8 left-[60%] w-[80%] border-t-2 border-dashed border-foreground/10" />
+                )}
+                <div className="w-16 h-16 rounded-full bg-white shadow-md flex items-center justify-center mx-auto mb-4 relative z-10">
+                  <span className="text-2xl">{s.icon}</span>
+                </div>
+                <h3 className="font-bold text-sm mb-1">{s.title}</h3>
+                <p className="text-foreground/50 text-xs leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Starring You Section */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
@@ -323,6 +452,27 @@ export default function Home() {
                 <div className="text-3xl mb-3">{f.icon}</div>
                 <h3 className="font-bold text-lg mb-2">{f.title}</h3>
                 <p className="text-foreground/60 text-sm leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats / Social Proof */}
+      <section className="py-16 px-6 bg-white border-t border-foreground/5">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {[
+              { value: '99+', label: 'Card Designs' },
+              { value: '19', label: 'Occasions' },
+              { value: '9', label: 'Video Cards' },
+              { value: '13', label: 'Provinces & Territories' },
+            ].map((stat, i) => (
+              <div key={i}>
+                <p className="text-3xl md:text-4xl font-black" style={{ color: 'var(--red)', fontFamily: 'var(--font-playfair), Playfair Display, serif' }}>
+                  {stat.value}
+                </p>
+                <p className="text-sm text-foreground/50 mt-1">{stat.label}</p>
               </div>
             ))}
           </div>

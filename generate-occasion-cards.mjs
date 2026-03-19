@@ -1,14 +1,13 @@
 #!/usr/bin/env node
 /**
  * MapleCard — Occasion Card Generator
- * Uses Google Imagen 4 via @google/genai to generate occasion-specific greeting cards.
+ * Generates greeting card images for new occasions using Google Imagen 4.
  *
  * USAGE:
- *   $env:GEMINI_API_KEY="your-key"
- *   node generate-occasion-cards.mjs                      → all tiers
- *   node generate-occasion-cards.mjs --tier=1             → tier 1 only
- *   node generate-occasion-cards.mjs --occasion=birthday  → single occasion
- *   node generate-occasion-cards.mjs --dry                → preview prompts only
+ *   node generate-occasion-cards.mjs                       → all occasions
+ *   node generate-occasion-cards.mjs --occasion=valentines  → single occasion
+ *   node generate-occasion-cards.mjs --dry                  → preview prompts only
+ *   node generate-occasion-cards.mjs --model=fast           → cheaper/faster
  */
 
 import { GoogleGenAI } from '@google/genai';
@@ -17,262 +16,249 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 if (!API_KEY) {
-  console.error('Missing GEMINI_API_KEY. Set it: $env:GEMINI_API_KEY="your-key"');
+  console.error('\n  No API key. export GEMINI_API_KEY="..."');
   process.exit(1);
 }
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 const args = Object.fromEntries(
   process.argv.slice(2)
     .filter(a => a.startsWith('--'))
     .map(a => { const [k, v] = a.slice(2).split('='); return [k, v ?? true]; })
 );
-const DRY_RUN = args.dry === true;
-const TIER_FILTER = args.tier ? parseInt(args.tier) : null;
-const OCCASION_FILTER = args.occasion || null;
 
-// ─── PROMPTS ─────────────────────────────────────────────────────────────────
-// Each prompt specifies a real art technique to avoid the "AI look".
-// No text/words in any image — the card overlay handles messaging.
+const MODELS = {
+  fast:     'imagen-4.0-fast-generate-001',
+  standard: 'imagen-4.0-generate-001',
+  ultra:    'imagen-4.0-ultra-generate-001',
+};
+const MODEL = MODELS[args.model || 'standard'];
+const DRY = !!args.dry;
 
-const OCCASIONS = [
-  // ═══ TIER 1 — 6 cards each ═══
-  {
-    occasion: 'birthday', tier: 1, cards: [
-      { name: 'cake-risograph', prompt: 'Risograph print illustration of a layered birthday cake with tall candles, bold limited colour palette of coral pink, teal, and gold on cream paper, visible ink grain texture, slight colour misregistration, celebratory confetti dots, no text no words no letters' },
-      { name: 'bear-gouache', prompt: 'Hand-painted gouache illustration of a friendly black bear wearing a small party hat, holding a cupcake with a single candle, warm forest background with birch trees, opaque brushstrokes visible, folk art style, no text no words no letters' },
-      { name: 'moose-linocut', prompt: 'Bold linocut block print of a majestic moose with enormous antlers decorated with small birthday candles, deep navy ink on cream paper, strong carved lines, woodblock aesthetic, no text no words no letters' },
-      { name: 'balloons-midcentury', prompt: 'Mid-century modern illustration of colourful balloons floating over a Canadian lake landscape with pine trees, geometric stylized shapes, warm retro 1960s colour palette of mustard yellow, burnt orange, olive green, teal, no text no words no letters' },
-      { name: 'loon-screenprint', prompt: 'Screen print style illustration of a common loon on a calm lake at golden hour, flat colour layers in navy, gold, forest green, and cream, visible halftone dots, vintage poster aesthetic, no text no words no letters' },
-      { name: 'party-letterpress', prompt: 'Vintage letterpress style birthday party scene with streamers and bunting, debossed texture on thick cotton paper, two-colour printing in deep red and gold, fine line engraving details, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'christmas', tier: 1, cards: [
-      { name: 'cabin-gouache', prompt: 'Hand-painted gouache illustration of a cozy log cabin in deep Canadian snow at night, warm golden light glowing from windows, snow-laden spruce trees, smoke rising from chimney, starry sky, thick opaque brushstrokes, no text no words no letters' },
-      { name: 'skating-risograph', prompt: 'Risograph print of people ice skating on a frozen pond surrounded by snow-covered pines, limited colour palette of red, navy blue, and white on cream paper, visible grain texture, playful folk art figures, no text no words no letters' },
-      { name: 'tree-linocut', prompt: 'Linocut block print of a decorated Christmas tree with a bright star on top, bold carved lines, deep green and red ink on cream paper, ornaments rendered as simple geometric shapes, woodcut folk art style, no text no words no letters' },
-      { name: 'fireplace-midcentury', prompt: 'Mid-century modern illustration of a stone fireplace with hanging stockings, crackling fire, a cat curled on a rug, geometric stylized shapes, warm retro palette of burnt orange, forest green, cream, and burgundy, no text no words no letters' },
-      { name: 'mittens-screenprint', prompt: 'Screen print illustration of a pair of hand-knit Canadian mittens with maple leaf pattern, flat colour layers in red, white, and navy, slight registration offset, cozy winter aesthetic, no text no words no letters' },
-      { name: 'hotchocolate-gouache', prompt: 'Hand-painted gouache illustration of two mugs of hot chocolate with marshmallows on a wooden table by a frosted window, snow falling outside, warm candlelight, thick painterly brushstrokes, hygge atmosphere, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'thank-you', tier: 1, cards: [
-      { name: 'bouquet-gouache', prompt: 'Hand-painted gouache illustration of a wild Canadian flower bouquet in a mason jar, lupins, fireweed, black-eyed susans, thick opaque brushstrokes on warm cream background, folk art botanical style, no text no words no letters' },
-      { name: 'syrup-risograph', prompt: 'Risograph print of a glass bottle of maple syrup with a red ribbon, autumn maple leaves scattered around, limited palette of amber, deep red, and brown on cream paper, ink grain texture visible, no text no words no letters' },
-      { name: 'tea-midcentury', prompt: 'Mid-century modern illustration of a tea set with cookies on a table overlooking a Canadian garden, geometric shapes, retro colour palette of teal, mustard, coral, and cream, warm and inviting, no text no words no letters' },
-      { name: 'bird-linocut', prompt: 'Linocut block print of a chickadee carrying a small envelope in its beak, perched on a pine branch, bold carved lines, two-colour print in navy and rust on cream paper, no text no words no letters' },
-      { name: 'canoe-screenprint', prompt: 'Screen print style illustration of a red canoe on a glassy Canadian lake at sunrise, flat colour layers in warm gold, deep teal, forest green, and red, vintage travel poster aesthetic, no text no words no letters' },
-      { name: 'garden-letterpress', prompt: 'Vintage letterpress illustration of a wooden garden gate covered in climbing roses, leading to a cottage garden, fine engraved line work, two-colour print in sage green and dusty rose on cotton paper, no text no words no letters' },
-    ]
-  },
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 
-  // ═══ TIER 2 — 4 cards each ═══
-  {
-    occasion: 'mothers-day', tier: 2, cards: [
-      { name: 'flowers-gouache', prompt: 'Hand-painted gouache illustration of a lush peony and lilac arrangement in a vintage ceramic vase, soft pinks, lavenders, and creams, thick brushstrokes on warm background, romantic botanical style, no text no words no letters' },
-      { name: 'garden-risograph', prompt: 'Risograph print of a woman tending a cottage garden full of hollyhocks and delphiniums, limited palette of rose pink, sage green, and gold, ink grain texture, warm nostalgic feeling, no text no words no letters' },
-      { name: 'hummingbird-linocut', prompt: 'Linocut block print of a ruby-throated hummingbird hovering at a trumpet vine flower, bold carved lines, emerald green and ruby red ink on cream paper, natural elegance, no text no words no letters' },
-      { name: 'teaset-midcentury', prompt: 'Mid-century modern illustration of a beautiful china tea set with wildflowers on a sunlit table, geometric shapes, soft retro palette of blush pink, sage, gold, and cream, warm afternoon light, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'fathers-day', tier: 2, cards: [
-      { name: 'fishing-gouache', prompt: 'Hand-painted gouache illustration of a fishing rod and tackle box on a wooden dock at a Canadian lake, morning mist, pine trees reflected in still water, warm earthy tones, painterly brushstrokes, no text no words no letters' },
-      { name: 'bbq-risograph', prompt: 'Risograph print of a backyard BBQ scene with a charcoal grill, cold beverages, and Muskoka chairs, limited palette of charcoal, red, and amber on cream paper, summer vibes, ink grain texture, no text no words no letters' },
-      { name: 'workshop-linocut', prompt: 'Linocut block print of a woodworking workshop with hand tools, wood shavings, a half-built birdhouse on workbench, bold carved lines, warm brown and navy ink on cream paper, no text no words no letters' },
-      { name: 'canoe-screenprint', prompt: 'Screen print illustration of a father and child paddling a red canoe through autumn-coloured Canadian wilderness, flat colour layers in rust, gold, forest green, and navy, nostalgic warmth, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'valentines', tier: 2, cards: [
-      { name: 'loons-gouache', prompt: 'Hand-painted gouache illustration of two common loons swimming together on a misty lake at dawn, their reflections mirrored in still water, soft pinks and golds of sunrise, romantic and serene, no text no words no letters' },
-      { name: 'winterwalk-risograph', prompt: 'Risograph print of a couple walking hand-in-hand through a snowy birch forest, limited palette of soft pink, warm grey, and gold, ink grain texture on cream paper, gentle romantic mood, no text no words no letters' },
-      { name: 'cabin-linocut', prompt: 'Linocut block print of a cozy cabin with heart-shaped smoke rising from the chimney, snow on the roof, warm light in windows, carved lines in deep red and charcoal on cream paper, no text no words no letters' },
-      { name: 'wildflower-screenprint', prompt: 'Screen print illustration of a heart shape made entirely of Canadian wildflowers — trilliums, fireweed, lupins, wild roses — flat colour layers in pinks, purples, and greens on cream, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'wedding', tier: 2, cards: [
-      { name: 'chairs-gouache', prompt: 'Hand-painted gouache illustration of two Muskoka chairs side by side on a dock overlooking a calm lake at sunset, intertwined wildflowers draped over armrests, golden warm light, romantic atmosphere, no text no words no letters' },
-      { name: 'bircharch-risograph', prompt: 'Risograph print of a wedding arch made of birch branches and white wildflowers in a forest clearing, dappled sunlight, limited palette of sage green, blush pink, and gold on cream paper, no text no words no letters' },
-      { name: 'lakeside-linocut', prompt: 'Linocut block print of a lakeside ceremony scene with lanterns hanging from pine trees, mountains in background, bold carved lines, navy and gold ink on cream paper, elegant simplicity, no text no words no letters' },
-      { name: 'toast-midcentury', prompt: 'Mid-century modern illustration of two champagne glasses clinking with sparkles, geometric art deco style, limited palette of gold, cream, and soft pink, celebratory and elegant, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'graduation', tier: 2, cards: [
-      { name: 'cap-risograph', prompt: 'Risograph print of a graduation cap with a maple leaf pinned to it, tossed in the air against a blue sky, limited palette of navy, red, and gold on cream paper, celebratory ink grain texture, no text no words no letters' },
-      { name: 'books-gouache', prompt: 'Hand-painted gouache illustration of a stack of books with autumn maple leaves as bookmarks, a warm cup of coffee beside them, cozy study atmosphere, rich warm colours, no text no words no letters' },
-      { name: 'campus-linocut', prompt: 'Linocut block print of a collegiate bell tower with Canadian flag, autumn trees in foreground, bold carved lines, navy and burnt orange ink on cream paper, dignified and warm, no text no words no letters' },
-      { name: 'openroad-screenprint', prompt: 'Screen print illustration of an open road stretching through Canadian Rockies with a sunrise ahead, flat colour layers in gold, teal, and warm grey, sense of possibility and adventure, no text no words no letters' },
-    ]
-  },
-
-  // ═══ TIER 3 — 3 cards each ═══
-  {
-    occasion: 'new-baby', tier: 3, cards: [
-      { name: 'woodland-gouache', prompt: 'Hand-painted gouache illustration of adorable Canadian woodland baby animals — a fox kit, baby bunny, and fawn — gathered in a meadow of wildflowers, soft pastel tones, gentle and whimsical nursery art style, no text no words no letters' },
-      { name: 'moccasins-risograph', prompt: 'Risograph print of tiny beaded baby moccasins beside a small stuffed moose toy, limited palette of soft yellow, mint green, and warm grey on cream paper, tender and delicate, no text no words no letters' },
-      { name: 'stork-linocut', prompt: 'Linocut block print of a great blue heron flying over Canadian mountain peaks carrying a small bundle, bold elegant lines, soft blue and gold ink on cream paper, whimsical and sweet, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'get-well', tier: 3, cards: [
-      { name: 'soup-gouache', prompt: 'Hand-painted gouache illustration of a steaming bowl of soup with fresh bread on a wooden table, a cozy knit blanket draped nearby, warm golden light from a window, comforting and nurturing, no text no words no letters' },
-      { name: 'blanket-risograph', prompt: 'Risograph print of a cozy reading nook with a plaid blanket, hot tea, and a stack of books by a rainy window, limited palette of warm amber, soft blue, and cream, comforting mood, no text no words no letters' },
-      { name: 'sunflowers-linocut', prompt: 'Linocut block print of tall sunflowers in a garden with a butterfly visiting, bold carved lines, cheerful yellow and green ink on cream paper, uplifting and bright, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'thinking-of-you', tier: 3, cards: [
-      { name: 'canoe-gouache', prompt: 'Hand-painted gouache illustration of a lone red canoe tied to a dock on a misty Canadian lake at dawn, soft blues and golds, reflective and peaceful atmosphere, painterly brushstrokes, no text no words no letters' },
-      { name: 'aurora-risograph', prompt: 'Risograph print of northern lights dancing over a snowy boreal forest, limited palette of emerald green, purple, and navy on dark paper, ethereal ink grain texture, contemplative mood, no text no words no letters' },
-      { name: 'trail-screenprint', prompt: 'Screen print illustration of an autumn hiking trail through a Canadian maple forest, flat colour layers in rich amber, crimson, gold, and brown, peaceful solitude, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'just-because', tier: 3, cards: [
-      { name: 'beaver-gouache', prompt: 'Hand-painted gouache illustration of a cheerful beaver holding a bouquet of wildflowers, standing by a stream with birch trees, whimsical folk art style, warm earthy tones, endearing expression, no text no words no letters' },
-      { name: 'moose-linocut', prompt: 'Linocut block print portrait of a dignified moose with magnificent antlers, forest background with subtle northern lights, bold carved lines, deep green and amber ink on cream paper, no text no words no letters' },
-      { name: 'mountains-screenprint', prompt: 'Screen print illustration of a panoramic Canadian Rocky Mountain vista with a turquoise lake, flat colour layers in teal, warm grey, and gold, vintage national park poster aesthetic, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'congratulations', tier: 3, cards: [
-      { name: 'fireworks-gouache', prompt: 'Hand-painted gouache illustration of fireworks bursting over Parliament Hill in Ottawa reflected in the Rideau Canal, bold expressive brushstrokes, deep navy sky with bursts of gold, red, and white, no text no words no letters' },
-      { name: 'champagne-risograph', prompt: 'Risograph print of champagne glasses with effervescent bubbles and scattered confetti, limited palette of gold, coral pink, and navy on cream paper, celebratory and elegant, no text no words no letters' },
-      { name: 'summit-screenprint', prompt: 'Screen print illustration of a hiker at a mountain summit with arms raised in triumph, vast Canadian landscape stretching below, flat colour layers in warm gold, teal, and charcoal, triumphant feeling, no text no words no letters' },
-    ]
-  },
-
-  // ═══ TIER 4 — 3 cards each ═══
-  {
-    occasion: 'canada-day', tier: 4, cards: [
-      { name: 'fireworks-gouache', prompt: 'Hand-painted gouache illustration of spectacular fireworks over a Canadian city skyline reflected in water, red and white bursts against deep blue sky, bold painterly strokes, patriotic and jubilant, no text no words no letters' },
-      { name: 'parade-risograph', prompt: 'Risograph print of a small-town Canada Day parade with maple leaf flags, bunting, and marching band, limited palette of red, white, and navy on cream paper, nostalgic community celebration, no text no words no letters' },
-      { name: 'flag-linocut', prompt: 'Linocut block print of a Canadian flag waving proudly against a bright blue sky with cumulus clouds, bold carved lines, vibrant red and white ink, strong and dignified, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'thanksgiving', tier: 4, cards: [
-      { name: 'harvest-gouache', prompt: 'Hand-painted gouache illustration of a rustic harvest table set outdoors with pumpkins, gourds, autumn leaves, and warm bread, golden afternoon light through maple trees, abundance and warmth, no text no words no letters' },
-      { name: 'pumpkin-risograph', prompt: 'Risograph print of a pumpkin patch with a red barn in the background, autumn foliage in full colour, limited palette of burnt orange, deep red, and olive on cream paper, harvest season warmth, no text no words no letters' },
-      { name: 'cornucopia-linocut', prompt: 'Linocut block print of a cornucopia overflowing with Canadian autumn harvest — apples, squash, corn, cranberries, maple leaves — bold carved lines, warm amber and burgundy ink on cream, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'new-year', tier: 4, cards: [
-      { name: 'midnight-gouache', prompt: 'Hand-painted gouache illustration of a midnight cityscape with fireworks and a clock striking twelve, bold brushstrokes, deep navy and gold palette with pops of silver, festive and hopeful, no text no words no letters' },
-      { name: 'frozenlake-risograph', prompt: 'Risograph print of fireworks reflected in a frozen Canadian lake surrounded by snow-covered pines, limited palette of navy, gold, and silver on dark blue paper, magical winter night, no text no words no letters' },
-      { name: 'champagne-screenprint', prompt: 'Screen print illustration of champagne popping with an explosion of stars and streamers, flat colour layers in gold, black, and white, art deco inspired, celebratory energy, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'sympathy', tier: 4, cards: [
-      { name: 'lake-gouache', prompt: 'Hand-painted gouache illustration of a quiet lake at twilight with a single canoe on shore, soft muted blues and lavenders, gentle and contemplative, a sense of peace and stillness, no text no words no letters' },
-      { name: 'candle-risograph', prompt: 'Risograph print of a single lit candle in a window with rain on the glass, limited palette of warm amber, soft grey, and cream, gentle and reverent mood, no text no words no letters' },
-      { name: 'forest-linocut', prompt: 'Linocut block print of a serene autumn forest path with light filtering through the canopy, bold carved lines, muted gold and deep green ink on cream paper, peaceful and meditative, no text no words no letters' },
-    ]
-  },
-  {
-    occasion: 'remembrance-day', tier: 4, cards: [
-      { name: 'poppies-gouache', prompt: 'Hand-painted gouache illustration of a field of red poppies at sunset with a silhouetted cross memorial in the distance, deep reds and warm golds, respectful and solemn, Flanders fields inspired, no text no words no letters' },
-      { name: 'cenotaph-risograph', prompt: 'Risograph print of a cenotaph memorial wreath with red poppies and autumn leaves at its base, limited palette of deep red, charcoal, and gold on cream paper, dignified and respectful, no text no words no letters' },
-      { name: 'soldier-linocut', prompt: 'Linocut block print silhouette of a lone soldier standing at attention at dawn, poppy flowers in foreground, bold carved lines, deep crimson and black ink on cream paper, solemn tribute, no text no words no letters' },
-    ]
-  },
+const STYLES = [
+  { id: 'gouache', desc: 'warm gouache painting on textured cream paper, soft visible brushstrokes' },
+  { id: 'risograph', desc: 'risograph print with slight color misregistration, limited palette, halftone dots visible' },
+  { id: 'linocut', desc: 'bold linocut block print, strong black outlines, hand-carved texture' },
+  { id: 'screenprint', desc: 'vintage screenprint poster, flat color layers, retro graphic design' },
+  { id: 'midcentury', desc: '1950s-60s mid-century modern illustration, atomic age geometric shapes, warm palette' },
+  { id: 'letterpress', desc: 'elegant letterpress printed card, deep debossed text feeling, classic typography' },
 ];
 
-// ─── GOOGLE IMAGEN 4 API ─────────────────────────────────────────────────────
+const OCCASIONS = {
+  'mothers-day': {
+    folder: 'mothers-day',
+    cards: [
+      { name: 'tulips', subject: 'a bouquet of tulips in a mason jar on a kitchen windowsill with a Canadian landscape outside' },
+      { name: 'bear-cubs', subject: 'a mother bear with two cubs walking through a spring wildflower meadow in the Canadian Rockies' },
+      { name: 'garden', subject: 'a cozy cottage garden with hummingbirds and lupins, a watering can with a heart tag' },
+      { name: 'tea-time', subject: 'an elegant tea set with wildflowers, Canadian blueberry scones on a lace tablecloth' },
+      { name: 'canoe', subject: 'a mother and child paddling a red canoe on a calm misty lake at sunrise' },
+      { name: 'cardinal', subject: 'a bright red cardinal perched on a blooming cherry blossom branch, soft spring morning' },
+    ],
+  },
+  'fathers-day': {
+    folder: 'fathers-day',
+    cards: [
+      { name: 'fishing', subject: 'a father and child fishing from a wooden dock on a Canadian lake, tackle box and thermos nearby' },
+      { name: 'campfire', subject: 'a father tending a campfire with camping gear, northern pines, and a starry sky' },
+      { name: 'workshop', subject: 'a cozy workshop with woodworking tools, a birdhouse project half-finished, sawdust on the bench' },
+      { name: 'hockey', subject: 'a hockey stick and puck on frozen pond ice, winter trees and warm cabin light in background' },
+      { name: 'bbq', subject: 'a classic Canadian backyard BBQ scene with a plaid apron, burgers, and a cold drink' },
+      { name: 'canoe-paddle', subject: 'a handcrafted wooden canoe paddle leaning against a red canoe by a lakeside dock' },
+    ],
+  },
+  'valentines': {
+    folder: 'valentines',
+    cards: [
+      { name: 'lovebirds', subject: 'two chickadees sitting together on a snowy branch with a heart-shaped snowflake' },
+      { name: 'northern-lights', subject: 'northern lights forming a heart shape over a snow-covered Canadian landscape' },
+      { name: 'hot-cocoa', subject: 'two mugs of hot chocolate with marshmallow hearts, cozy blanket and fireplace' },
+      { name: 'maple-heart', subject: 'a maple leaf shaped like a heart, autumn colors, scattered fall leaves' },
+      { name: 'skating', subject: 'a couple ice skating hand-in-hand on a frozen lake under string lights' },
+      { name: 'cabin', subject: 'a cozy snow-covered cabin with a heart wreath on the door, smoke from chimney' },
+    ],
+  },
+  'graduation': {
+    folder: 'graduation',
+    cards: [
+      { name: 'cap-toss', subject: 'graduation caps tossed in the air against a bright blue sky with maple leaves falling' },
+      { name: 'owl', subject: 'a wise great horned owl wearing a tiny graduation cap, perched on stacked books' },
+      { name: 'mountains', subject: 'a trail leading up to a mountain summit with a flag at the top, sunrise, achievement' },
+      { name: 'library', subject: 'a grand university library with stained glass, stacked books, and a diploma scroll' },
+      { name: 'compass', subject: 'a vintage brass compass on an old map of Canada, pointing to new adventures' },
+      { name: 'canoe-journey', subject: 'an empty canoe at a fork in a river, beautiful untouched wilderness ahead' },
+    ],
+  },
+  'sympathy': {
+    folder: 'sympathy',
+    cards: [
+      { name: 'peaceful-lake', subject: 'a serene misty lake at dawn with a single loon, soft golden light through pines' },
+      { name: 'wildflowers', subject: 'a gentle field of wildflowers with a single white butterfly, soft diffused light' },
+      { name: 'birch-grove', subject: 'a quiet birch tree grove with dappled sunlight, peaceful and contemplative' },
+      { name: 'starlight', subject: 'a single bright star in a twilight sky over a calm ocean, lighthouse in distance' },
+      { name: 'garden-bench', subject: 'an empty garden bench under a weeping willow, soft light, peace lilies nearby' },
+      { name: 'mountain-mist', subject: 'distant mountains fading into gentle mist layers, sunrise, quiet solitude' },
+    ],
+  },
+  'new-baby': {
+    folder: 'new-baby',
+    cards: [
+      { name: 'stork-moose', subject: 'a friendly Canadian moose carrying a baby bundle in its antlers, cheerful forest scene' },
+      { name: 'nursery', subject: 'a cozy nursery with a rocking chair, stuffed beaver toy, maple leaf mobile, warm light' },
+      { name: 'duckling', subject: 'a mother duck with a line of tiny ducklings crossing a Canadian country road' },
+      { name: 'knitted', subject: 'tiny knitted baby booties and a little toque on a soft blanket with a teddy bear' },
+      { name: 'forest-friends', subject: 'woodland baby animals (fawn, bunny, fox kit) gathered around a cradle in a forest clearing' },
+      { name: 'rainbow', subject: 'a bright rainbow over a peaceful Canadian countryside, little wooden birdhouse' },
+    ],
+  },
+  'anniversary': {
+    folder: 'anniversary',
+    cards: [
+      { name: 'sunset-canoe', subject: 'a couple in a canoe watching a golden sunset over a perfectly still Canadian lake' },
+      { name: 'dancing', subject: 'two silhouettes dancing under string lights on a deck overlooking mountains' },
+      { name: 'wine-toast', subject: 'two wine glasses clinking with a Niagara vineyard landscape in golden hour' },
+      { name: 'love-lock', subject: 'a heart-shaped lock on a bridge railing with a waterfall in the background' },
+      { name: 'cabin-fire', subject: 'two Muskoka chairs by a fire pit, starry sky, cozy cabin with warm windows' },
+      { name: 'geese', subject: 'a pair of Canada geese flying together over autumn-colored forest, lifetime bond' },
+    ],
+  },
+  'wedding': {
+    folder: 'wedding',
+    cards: [
+      { name: 'venue', subject: 'a beautiful lakeside wedding arch decorated with wildflowers, Rocky Mountains backdrop' },
+      { name: 'rings', subject: 'two wedding rings on a maple leaf, soft bokeh background with warm light' },
+      { name: 'bouquet', subject: 'a lush wedding bouquet with peonies, ferns, and Canadian wildflowers, ribbon detail' },
+      { name: 'toast', subject: 'champagne glasses under a tent with twinkling lights, elegant celebration' },
+      { name: 'barn', subject: 'a charming red barn wedding venue with string lights, wildflower meadow, sunset' },
+      { name: 'swans', subject: 'two trumpeter swans forming a heart shape on a calm Canadian lake at golden hour' },
+    ],
+  },
+  'congratulations': {
+    folder: 'congratulations',
+    cards: [
+      { name: 'fireworks', subject: 'spectacular fireworks over Niagara Falls, celebration, vibrant colors in night sky' },
+      { name: 'trophy', subject: 'a gleaming gold trophy on a pedestal with confetti falling, maple leaf confetti pieces' },
+      { name: 'champagne', subject: 'champagne bottle popping with golden sparkles, celebration, festive atmosphere' },
+      { name: 'summit', subject: 'a person standing triumphantly on a mountain peak in the Canadian Rockies, arms raised, sunrise' },
+      { name: 'ribbon', subject: 'a grand ribbon-cutting ceremony with red ribbon and golden scissors, confetti, celebration' },
+      { name: 'northern-lights', subject: 'spectacular northern lights display in purple and green over a Canadian celebration bonfire' },
+    ],
+  },
+  'get-well': {
+    folder: 'get-well',
+    cards: [
+      { name: 'soup', subject: 'a steaming bowl of homemade chicken soup with a cozy blanket and hot tea, warm kitchen' },
+      { name: 'sunshine', subject: 'bright sunshine breaking through clouds over a field of sunflowers, hope and warmth' },
+      { name: 'healing-garden', subject: 'a peaceful healing garden with lavender, butterflies, and a gentle waterfall' },
+      { name: 'teddy', subject: 'a cute teddy bear in a tiny toque holding a heart, sitting by a window with sunshine' },
+      { name: 'rainbow', subject: 'a vibrant rainbow over a spring meadow after rain, Canadian countryside, promise of better days' },
+      { name: 'tea-honey', subject: 'a warm cup of tea with honey and lemon, cozy blanket, stack of books, healing vibes' },
+    ],
+  },
+  'retirement': {
+    folder: 'retirement',
+    cards: [
+      { name: 'hammock', subject: 'a hammock strung between two pine trees by a Canadian lake, straw hat, perfect relaxation' },
+      { name: 'fishing-boat', subject: 'a peaceful fishing boat on a glassy lake at dawn, retirement bliss, no hurry' },
+      { name: 'garden', subject: 'a lush retirement garden with raised beds, tomatoes, flowers, gardening tools, sunny day' },
+      { name: 'road-trip', subject: 'a vintage camper van on the Trans-Canada Highway, mountains ahead, freedom and adventure' },
+      { name: 'golf', subject: 'a beautiful golf course in the Canadian Rockies, perfect day, clubs and cart on green' },
+      { name: 'rocking-chair', subject: 'a cozy rocking chair on a cabin porch overlooking mountains, cup of coffee, peaceful sunset' },
+    ],
+  },
+  'thinking-of-you': {
+    folder: 'thinking-of-you',
+    cards: [
+      { name: 'letter', subject: 'a handwritten letter on vintage paper with a pressed flower, warm candlelight' },
+      { name: 'window', subject: 'a cozy window seat with rain outside, a warm cup of tea, a book, thinking of someone' },
+      { name: 'moonlight', subject: 'a full moon reflecting on a still Canadian lake, peaceful night, deep connection' },
+      { name: 'wildflower', subject: 'a single beautiful wildflower growing in a crack, resilience and beauty, sunshine' },
+      { name: 'bridge', subject: 'a charming covered bridge in autumn colors, connecting two sides, Canadian countryside' },
+      { name: 'songbird', subject: 'a beautiful songbird singing on a branch at golden hour, musical notes suggested in light' },
+    ],
+  },
+};
 
-async function generateImage(prompt, filepath) {
-  const response = await ai.models.generateImages({
-    model: 'imagen-4.0-generate-001',
-    prompt,
-    config: { numberOfImages: 1, aspectRatio: '3:4' },
-  });
+async function generateCard(occasion, card, style) {
+  const folder = path.join(__dirname, 'public', 'cards', OCCASIONS[occasion].folder);
+  const filename = `${card.name}-${style.id}.jpg`;
+  const filepath = path.join(folder, filename);
 
-  const img = response.generatedImages[0];
-  const buf = Buffer.from(img.image.imageBytes, 'base64');
-  fs.writeFileSync(filepath, buf);
-}
-
-// ─── MAIN ────────────────────────────────────────────────────────────────────
-
-async function main() {
-  console.log('🍁 MapleCard — Occasion Card Generator (Imagen 4 via fal.ai)\n');
-
-  const filtered = OCCASIONS.filter(o => {
-    if (TIER_FILTER && o.tier !== TIER_FILTER) return false;
-    if (OCCASION_FILTER && o.occasion !== OCCASION_FILTER) return false;
-    return true;
-  });
-
-  const totalCards = filtered.reduce((sum, o) => sum + o.cards.length, 0);
-  const estimatedCost = (totalCards * 0.04).toFixed(2);
-  console.log(`   Occasions: ${filtered.length}`);
-  console.log(`   Cards: ${totalCards}`);
-  console.log(`   Estimated cost: ~$${estimatedCost}\n`);
-
-  if (DRY_RUN) {
-    for (const o of filtered) {
-      console.log(`\n📁 ${o.occasion} (tier ${o.tier})`);
-      for (const c of o.cards) {
-        console.log(`   🖼️  ${c.name}`);
-        console.log(`       ${c.prompt.slice(0, 120)}...`);
-      }
-    }
-    console.log('\n✅ Dry run complete. Remove --dry to generate.');
+  if (fs.existsSync(filepath)) {
+    console.log(`  SKIP ${filename} (exists)`);
     return;
   }
 
-  let completed = 0;
-  let failed = 0;
+  const prompt = `A beautiful greeting card illustration in ${style.desc} style. Subject: ${card.subject}. Vertical portrait orientation (3:4 ratio). No text, no words, no letters. Rich detail, warm inviting mood. Canadian-themed.`;
 
-  for (const o of filtered) {
-    const dir = path.join(__dirname, 'public', 'cards', o.occasion);
-    fs.mkdirSync(dir, { recursive: true });
-    console.log(`\n📁 ${o.occasion} (tier ${o.tier})`);
+  if (DRY) {
+    console.log(`  [DRY] ${filename}`);
+    console.log(`         ${prompt.slice(0, 120)}...`);
+    return;
+  }
 
-    for (const c of o.cards) {
-      const filepath = path.join(dir, `${c.name}.jpg`);
+  console.log(`  Generating ${filename}...`);
 
-      // Skip if already exists
-      if (fs.existsSync(filepath)) {
-        console.log(`   ⏭️  ${c.name} (exists, skipping)`);
-        completed++;
-        continue;
-      }
+  try {
+    const response = await ai.models.generateImages({
+      model: MODEL,
+      prompt,
+      config: {
+        numberOfImages: 1,
+        aspectRatio: '3:4',
+        outputMimeType: 'image/jpeg',
+      },
+    });
 
-      try {
-        console.log(`   🎨 ${c.name}...`);
-        await generateImage(c.prompt, filepath);
-        console.log(`   ✅ ${c.name}`);
-        completed++;
+    if (response.generatedImages && response.generatedImages.length > 0) {
+      const imageData = response.generatedImages[0].image.imageBytes;
+      fs.writeFileSync(filepath, Buffer.from(imageData, 'base64'));
+      console.log(`  OK ${filename}`);
+    } else {
+      console.log(`  EMPTY ${filename} (no image returned)`);
+    }
+  } catch (err) {
+    console.error(`  FAIL ${filename}: ${err.message}`);
+  }
 
-        // Delay to avoid rate limits (~10 req/min)
-        await new Promise(r => setTimeout(r, 8000));
-      } catch (e) {
-        console.error(`   ❌ ${c.name}: ${e.message}`);
-        failed++;
-        // Wait longer on error (rate limit)
-        if (e.message.includes('429') || e.message.includes('RESOURCE_EXHAUSTED')) {
-          console.log(`   ⏳ Rate limited, waiting 30s...`);
-          await new Promise(r => setTimeout(r, 30000));
-        } else {
-          await new Promise(r => setTimeout(r, 5000));
-        }
-      }
+  // Rate limit: wait 7s between requests (10 req/min limit)
+  await new Promise(r => setTimeout(r, 7000));
+}
+
+async function main() {
+  const targetOccasion = args.occasion;
+  const occasions = targetOccasion
+    ? { [targetOccasion]: OCCASIONS[targetOccasion] }
+    : OCCASIONS;
+
+  if (targetOccasion && !OCCASIONS[targetOccasion]) {
+    console.error(`Unknown occasion: ${targetOccasion}`);
+    console.error(`Available: ${Object.keys(OCCASIONS).join(', ')}`);
+    process.exit(1);
+  }
+
+  let total = 0;
+  for (const [name, occ] of Object.entries(occasions)) {
+    console.log(`\n=== ${name.toUpperCase()} ===`);
+    const folder = path.join(__dirname, 'public', 'cards', occ.folder);
+    fs.mkdirSync(folder, { recursive: true });
+
+    for (let i = 0; i < occ.cards.length; i++) {
+      const card = occ.cards[i];
+      const style = STYLES[i % STYLES.length];
+      await generateCard(name, card, style);
+      total++;
     }
   }
 
-  console.log(`\n🍁 Done! ${completed} generated, ${failed} failed.`);
-  console.log(`   Images saved to public/cards/`);
+  console.log(`\nDone. ${total} cards processed.`);
+  if (!DRY) {
+    console.log('Update CARD_TEMPLATES in CardEditor.tsx to include new cards.');
+  }
 }
 
-main();
+main().catch(console.error);
