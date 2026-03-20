@@ -6,6 +6,22 @@ const MAGIC_HOUR_BASE = 'https://api.magichour.ai/v1';
 const SWAPPABLE_CARDS: Record<string, { path: string; duration: number }> = {
   'mountie-moose': { path: '/videos/mountie-moose.mp4', duration: 15 },
   'curling-walk': { path: '/videos/curling-walk.mp4', duration: 15 },
+  't-honk': { path: '/videos/t-honk.mp4', duration: 15 },
+  'beaver-architect': { path: '/videos/beaver-architect.mp4', duration: 15 },
+  'zamboni-drive-thru': { path: '/videos/zamboni-drive-thru.mp4', duration: 15 },
+  'skookum': { path: '/videos/skookum.mp4', duration: 15 },
+  'syrup-iv': { path: '/videos/syrup-iv.mp4', duration: 15 },
+  'apologetic-standoff': { path: '/videos/apologetic-standoff.mp4', duration: 15 },
+  'bunny-hug': { path: '/videos/bunny-hug.mp4', duration: 15 },
+  // JibJab-style face swap videos
+  'poutine-chef': { path: '/videos/poutine-chef.mp4', duration: 15 },
+  'hockey-celly': { path: '/videos/hockey-celly.mp4', duration: 15 },
+  'sorry-dance': { path: '/videos/sorry-dance.mp4', duration: 15 },
+  'tims-dash': { path: '/videos/tims-dash.mp4', duration: 15 },
+  'ice-fishing-hero': { path: '/videos/ice-fishing-hero.mp4', duration: 15 },
+  'snow-angel-pro': { path: '/videos/snow-angel-pro.mp4', duration: 15 },
+  'syrup-chug': { path: '/videos/syrup-chug.mp4', duration: 15 },
+  'polar-plunge': { path: '/videos/polar-plunge.mp4', duration: 15 },
 };
 
 function getApiKey() {

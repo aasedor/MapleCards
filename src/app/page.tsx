@@ -133,6 +133,15 @@ const VIDEO_CARDS = [
   { src: '/videos/mountie-moose-thumb.jpg', name: 'Mountie Moose', video: '/videos/mountie-moose.mp4' },
   { src: '/videos/zamboni-drive-thru-thumb.jpg', name: 'Zamboni Drive-Thru', video: '/videos/zamboni-drive-thru.mp4' },
   { src: '/videos/skookum-thumb.jpg', name: 'Skookum Thumbs-Up', video: '/videos/skookum.mp4' },
+  // JibJab-style face swap videos
+  { src: '/videos/poutine-chef-thumb.jpg', name: 'Poutine Chef', video: '/videos/poutine-chef.mp4' },
+  { src: '/videos/hockey-celly-thumb.jpg', name: 'Hockey Celly', video: '/videos/hockey-celly.mp4' },
+  { src: '/videos/sorry-dance-thumb.jpg', name: 'Sorry Dance', video: '/videos/sorry-dance.mp4' },
+  { src: '/videos/tims-dash-thumb.jpg', name: 'Timmies Dash', video: '/videos/tims-dash.mp4' },
+  { src: '/videos/ice-fishing-hero-thumb.jpg', name: 'Ice Fishing Hero', video: '/videos/ice-fishing-hero.mp4' },
+  { src: '/videos/snow-angel-pro-thumb.jpg', name: 'Snow Angel Pro', video: '/videos/snow-angel-pro.mp4' },
+  { src: '/videos/syrup-chug-thumb.jpg', name: 'Syrup Power-Up', video: '/videos/syrup-chug.mp4' },
+  { src: '/videos/polar-plunge-thumb.jpg', name: 'Polar Plunge', video: '/videos/polar-plunge.mp4' },
 ];
 
 const FEATURES = [
@@ -465,7 +474,7 @@ export default function Home() {
             {[
               { value: '99+', label: 'Card Designs' },
               { value: '19', label: 'Occasions' },
-              { value: '9', label: 'Video Cards' },
+              { value: '17', label: 'Video Cards' },
               { value: '13', label: 'Provinces & Territories' },
             ].map((stat, i) => (
               <div key={i}>

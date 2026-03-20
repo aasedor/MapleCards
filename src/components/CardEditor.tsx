@@ -4,6 +4,8 @@ import React, { useRef, useState, useCallback } from 'react';
 import html2canvas from 'html2canvas';
 import CardPreview from './CardPreview';
 import StarringYou from './StarringYou';
+import FaceSwapUpload from './FaceSwapUpload';
+import CutoutCardCreator from './CutoutCardCreator';
 import Link from 'next/link';
 import { useToast } from './ToastProvider';
 
@@ -132,6 +134,15 @@ const CARD_TEMPLATES: CardTemplate[] = [
   { id: 'vid-syrup', name: 'Maple Syrup IV', src: '/videos/syrup-iv-thumb.jpg', occasion: 'Get Well', style: 'video', video: '/videos/syrup-iv.mp4' },
   { id: 'vid-standoff', name: 'Apologetic Standoff', src: '/videos/apologetic-standoff-thumb.jpg', occasion: 'Apology', style: 'video', video: '/videos/apologetic-standoff.mp4' },
   { id: 'vid-bunny', name: 'Bunny Hug', src: '/videos/bunny-hug-thumb.jpg', occasion: 'Warm Wishes', style: 'video', video: '/videos/bunny-hug.mp4' },
+  // JibJab-style face swap videos
+  { id: 'vid-poutine', name: 'Poutine Chef', src: '/videos/poutine-chef-thumb.jpg', occasion: 'Birthday', style: 'video', video: '/videos/poutine-chef.mp4' },
+  { id: 'vid-hockey', name: 'Hockey Celly', src: '/videos/hockey-celly-thumb.jpg', occasion: 'Congratulations', style: 'video', video: '/videos/hockey-celly.mp4' },
+  { id: 'vid-sorry', name: 'Sorry Dance', src: '/videos/sorry-dance-thumb.jpg', occasion: 'Apology', style: 'video', video: '/videos/sorry-dance.mp4' },
+  { id: 'vid-tims', name: "Timmies Dash", src: '/videos/tims-dash-thumb.jpg', occasion: 'Thank You', style: 'video', video: '/videos/tims-dash.mp4' },
+  { id: 'vid-icefish', name: 'Ice Fishing Hero', src: '/videos/ice-fishing-hero-thumb.jpg', occasion: 'Retirement', style: 'video', video: '/videos/ice-fishing-hero.mp4' },
+  { id: 'vid-snowangel', name: 'Snow Angel Pro', src: '/videos/snow-angel-pro-thumb.jpg', occasion: 'Just Because', style: 'video', video: '/videos/snow-angel-pro.mp4' },
+  { id: 'vid-syrupchug', name: 'Syrup Power-Up', src: '/videos/syrup-chug-thumb.jpg', occasion: 'Get Well', style: 'video', video: '/videos/syrup-chug.mp4' },
+  { id: 'vid-plunge', name: 'Polar Plunge', src: '/videos/polar-plunge-thumb.jpg', occasion: 'Birthday', style: 'video', video: '/videos/polar-plunge.mp4' },
 ];
 
 const OCCASIONS = ['All', 'Birthday', 'Christmas', 'Thank You', "Mother's Day", "Father's Day", "Valentine's", 'Anniversary', 'Wedding', 'Graduation', 'New Baby', 'Sympathy', 'Congratulations', 'Retirement', 'Get Well', 'Just Because', 'Encouragement', 'Apology', 'Warm Wishes'];
@@ -157,8 +168,29 @@ const TEXT_COLORS = [
   { id: 'gold', hex: '#b8860b', label: 'Gold' },
 ];
 
-type TabKey = 'designs' | 'starring-you';
+type TabKey = 'designs' | 'starring-you' | 'cutout';
 type Step = 'pick' | 'customize';
+
+// Map video card template IDs to face-swap API videoIds
+const VIDEO_FACE_SWAP_MAP: Record<string, string> = {
+  'vid-thonk': 't-honk',
+  'vid-beaver': 'beaver-architect',
+  'vid-curling': 'curling-walk',
+  'vid-mountie': 'mountie-moose',
+  'vid-zamboni': 'zamboni-drive-thru',
+  'vid-skookum': 'skookum',
+  'vid-syrup': 'syrup-iv',
+  'vid-standoff': 'apologetic-standoff',
+  'vid-bunny': 'bunny-hug',
+  'vid-poutine': 'poutine-chef',
+  'vid-hockey': 'hockey-celly',
+  'vid-sorry': 'sorry-dance',
+  'vid-tims': 'tims-dash',
+  'vid-icefish': 'ice-fishing-hero',
+  'vid-snowangel': 'snow-angel-pro',
+  'vid-syrupchug': 'syrup-chug',
+  'vid-plunge': 'polar-plunge',
+};
 
 const MESSAGE_POSITIONS = [
   { id: 'bottom', label: 'Bottom' },
@@ -464,6 +496,7 @@ export default function CardEditor() {
           <div className="flex gap-2 mb-8">
             {([
               { key: 'designs' as TabKey, label: 'Card Designs' },
+              { key: 'cutout' as TabKey, label: 'Cutout Cards' },
               { key: 'starring-you' as TabKey, label: 'Starring You' },
             ]).map((tab) => (
               <button
@@ -563,6 +596,29 @@ export default function CardEditor() {
                 </div>
               )}
             </>
+          )}
+
+          {activeTab === 'cutout' && (
+            <div className="max-w-lg">
+              <h1 className="text-2xl md:text-3xl font-black mb-2" style={{ fontFamily: 'var(--font-playfair), Playfair Display, serif' }}>
+                Cutout Cards
+              </h1>
+              <p className="text-foreground/50 mb-6 text-sm">Upload your face and star in a funny animated card — JibJab style!</p>
+              <CutoutCardCreator
+                onCardReady={(videoBlob, message, thumbnailUrl) => {
+                  const videoUrl = URL.createObjectURL(videoBlob);
+                  setCard((prev) => ({
+                    ...prev,
+                    template: 'Cutout Animation',
+                    message,
+                    video: videoUrl,
+                    faceSwapImage: thumbnailUrl,
+                    backgroundImage: undefined,
+                  }));
+                  setStep('customize');
+                }}
+              />
+            </div>
           )}
 
           {activeTab === 'starring-you' && (
@@ -790,6 +846,23 @@ export default function CardEditor() {
                 Bilingual (French/English)
               </label>
             </div>
+
+            {/* Face Swap for video cards */}
+            {selectedTemplate?.video && selectedTemplate.id && VIDEO_FACE_SWAP_MAP[selectedTemplate.id] && (
+              <div className="mb-5">
+                <FaceSwapUpload
+                  videoId={VIDEO_FACE_SWAP_MAP[selectedTemplate.id]}
+                  onSwapComplete={(swappedVideoUrl) => {
+                    setCard((prev) => ({
+                      ...prev,
+                      video: swappedVideoUrl,
+                      faceSwapImage: undefined,
+                    }));
+                    toast('Face swap complete! Your personalized video is ready.', 'success');
+                  }}
+                />
+              </div>
+            )}
 
             <hr className="border-foreground/5 my-6" />
 
